@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <!-- ゲームスクリーン -->
+    <com.my_first_game.GameView
+        android:id="@+id/gameview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.my_first_game.GameView>
+
+    <!-- 射撃モード変更ボタン -->
+    <ImageButton
+        android:id="@+id/imagebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="133dp"
+        android:src="@drawable/onebullet"
+        android:onClick="modifyFireMode"/>
+
+    <!-- TODO -->
+    <!-- スコア表示 -->
+    <TextView
+        android:id="@+id/scoretext"
+        android:layout_width="200pt"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="117dp"
+        android:text="@string/scoreText"
+        android:textColor="@color/white"
+        android:textSize="14pt" />
+
+    <!-- HP表示 -->
+    <TextView
+        android:id="@+id/healthtext"
+        android:layout_width="200pt"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="43dp"
+        android:layout_marginEnd="115dp"
+        android:text="HEALTH: 0"
+        android:textColor="@color/white"
+        android:textSize="14pt" />
+
+    <!-- タイム表示 -->
+    <TextView
+        android:id="@+id/timetext"
+        android:layout_width="50pt"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="720dp"
+        android:layout_marginEnd="279dp"
+        android:layout_marginBottom="6dp"
+        android:text="@string/timeText"
+        android:textColor="@color/white"
+        android:textSize="10pt" />
+
+    <!-- 敵の体力ゲージ -->
+    <!-- 設定ボタン -->
+
+
+</RelativeLayout>

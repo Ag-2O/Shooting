@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">my_first_game</string>
+    <string name="Title">Shooting!</string>
+    <string name="startButton">Start</string>
+    <string name="upButton">↑</string>
+    <string name="rightButton">→</string>
+    <string name="leftButton">←</string>
+    <string name="downButton">↓</string>
+    <string name="scoreText">SCORE: 0</string>
+    <string name="timeText">TIME: 0</string>
+</resources>
