@@ -179,6 +179,7 @@
         android:layout_marginBottom="382dp"
         android:onClick="startGame"
         android:text="@string/startButton"
+        android:typeface="sans"
         android:textSize="16pt" />
 
 </RelativeLayout>
