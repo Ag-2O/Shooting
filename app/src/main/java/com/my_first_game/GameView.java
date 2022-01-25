@@ -151,7 +151,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         isTap = false;
 
         // 敵オブジェクトの動き
-        //TODO:ダサい
         enemyPopR.add(180); enemyPopR.add(90); enemyPopR.add(270); enemyPopR.add(90); enemyPopR.add(270); enemyPopR.add(90); enemyPopR.add(180);
         enemyPopC.add(15); enemyPopC.add(50); enemyPopC.add(85); enemyPopC.add(120); enemyPopC.add(140); enemyPopC.add(170); enemyPopC.add(200);
         enemyPopS.add(40); enemyPopS.add(30); enemyPopS.add(30); enemyPopS.add(30); enemyPopS.add(30); enemyPopS.add(30); enemyPopS.add(30);
@@ -271,7 +270,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 Thread.sleep(50);
             } catch (Exception e){}
         }
-        //TODO: ゲームクリアとゲームオーバーを分ける
         if(isGameClear){
             ma.toResult(gameScore,1);   // ゲームクリア
         }else {
@@ -457,8 +455,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
     // ボスが弾を撃つ
     public void bossFireBullet(int i, int level){
-        //TODO: for文とかでまとめたほうが美しい
-
         // 通常
         object.add(new EnemyBullet(displayWidth, displayHeight));
         object.get(object.size() - 1).objectInit(enemyBulletBit, object.get(i).centerX - 150,

@@ -23,14 +23,7 @@ import android.widget.TextView;
 import java.lang.reflect.Method;
 
 /*
-SurfaceView基礎：https://qiita.com/croquette0212/items/24dc2b6de3730e831aab
-               ：http://android-note.open-memo.net/sub/other_view__get_view_size.html
-ゲーム全体：http://androidn.hannnari.com/link200-shooting-2.html
-ボタン処理：https://stackoverflow.com/questions/26160442/settext-cannot-resolve-method
-        ：https://akira-watson.com/android/imagebutton.html
-デザイン：https://hakoniwadesign.com/?page_id=4318
-
-
+    メイン画面
  */
 
 public class MainActivity extends AppCompatActivity {
@@ -42,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     public GameView gv;
 
     //TODO: 敵の体力ゲージ
-    //TODO: ユーザビリティを考慮した配置にする
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
