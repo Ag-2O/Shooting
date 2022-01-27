@@ -39,129 +39,12 @@
         android:scaleY="2"
         android:src="@drawable/player2" />
 
-
-    <!-- アイコンの説明 -->
-    <TableLayout
-        android:layout_width="316dp"
-        android:layout_height="300dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="410dp">
-
-        <TableRow android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="16pt"
-                android:layout_height="16pt"
-                android:src="@drawable/player2" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="player"
-                android:textColor="@color/white"
-                android:textSize="16pt" />
-        </TableRow>
-
-        <TableRow
-            android:layout_marginTop="2pt"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="16pt"
-                android:layout_height="16pt"
-                android:src="@drawable/enemy" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="enemy"
-                android:textColor="@color/white"
-                android:textSize="16pt" />
-        </TableRow>
-
-        <TableRow
-            android:layout_marginTop="2dp"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="16pt"
-                android:layout_height="16pt"
-                android:src="@drawable/doublebullets" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="mode change"
-                android:textColor="@color/white"
-                android:textSize="16pt" />
-        </TableRow>
-
-        <TableRow
-            android:layout_marginTop="2dp"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="16pt"
-                android:layout_height="16pt"
-                android:src="@drawable/bullet2" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="player's bullet"
-                android:textColor="@color/white"
-                android:textSize="16pt" />
-        </TableRow>
-
-        <TableRow
-            android:layout_marginTop="2dp"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="16pt"
-                android:layout_height="16pt"
-                android:src="@drawable/enemybullet" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="enemy's bullet"
-                android:textColor="@color/white"
-                android:textSize="16pt" />
-        </TableRow>
-
-        <TableRow
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="22pt"
-                android:layout_height="22pt"
-                android:src="@drawable/item" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="power up item"
-                android:textColor="@color/white"
-                android:textSize="16pt" />
-        </TableRow>
-    </TableLayout>
-
-
     <!-- タイトル -->
     <TextView
         android:id="@+id/Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="182dp"
         android:text="@string/Title"
@@ -174,9 +57,8 @@
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@id/Title"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="382dp"
         android:onClick="startGame"
         android:text="@string/startButton"
         android:typeface="sans"

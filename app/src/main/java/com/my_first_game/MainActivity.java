@@ -19,6 +19,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import java.lang.reflect.Method;
@@ -32,10 +33,10 @@ public class MainActivity extends AppCompatActivity {
     public int gvWidth, gvHeight;
     // 射撃モード(0-3)
     public int fireMode = 0;
+    // 設定画面
+    public boolean isSetting = false;
     // surfaces
     public GameView gv;
-
-    //TODO: 敵の体力ゲージ
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +93,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // ボスの体力の表示
+    public void displayHealth(int health){
+        ProgressBar bar = (ProgressBar) findViewById(R.id.hpBar);
+        bar.setVisibility(View.VISIBLE);
+        bar.setMax(100);
+        bar.setProgress(100 - health/10);
+    }
+
+    // ボスの体力の更新
     public void updateHealth(int health){
-        //TextView scoreText = (TextView) findViewById(R.id.healthtext);
         ProgressBar bar = (ProgressBar)findViewById(R.id.hpBar);
-        bar.setMax(1000);
-        bar.setProgress(health);
-        //scoreText.setText("HEALTH: "+health);
+        bar.setMax(100);
+        bar.setProgress(100 - health/10);
     }
 
     // タイムの表示
@@ -113,4 +120,27 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // 設定ボタンのクリック
+    public void clickSetting(View view){
+        TableLayout tableLayout = (TableLayout) findViewById(R.id.explanation);
+        ImageButton imageButton = (ImageButton) findViewById(R.id.settingimagebutton);
+        TextView textView = (TextView) findViewById(R.id.pose);
+        if(!isSetting){
+            // pose
+            isSetting = true;
+            textView.setVisibility(View.VISIBLE);
+            tableLayout.setVisibility(View.VISIBLE);
+
+        }else{
+            // start
+            isSetting = false;
+            textView.setVisibility(View.GONE);
+            tableLayout.setVisibility(View.GONE);
+        }
+    }
+
+    // poseかどうかを返す
+    public boolean getIsPose(){
+        return isSetting;
+    }
 }

@@ -7,6 +7,7 @@ package com.my_first_game;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+import java.util.logging.Handler;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -17,6 +18,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -81,6 +83,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     public int gameScore = 0;           // ゲームスコア
     public boolean isGameOver = false;  // ゲームオーバーかどうか
     public boolean isGameClear = false; // ゲームクリアかどうか
+    public boolean isPose = false;      // ポーズ中かどうか
 
     // オブジェクトを格納するリスト
     private ArrayList<Object> object = new ArrayList();
@@ -200,7 +203,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         paint.setAntiAlias(true);
 
         // 描画
-        while(!isGameOver){
+        while(!isGameOver && !isGameClear){
             //Log.d("MainLoop","in while");
             canvas = holder.lockCanvas();
             canvas.drawColor(Color.BLACK);                      // 背景黒塗り
@@ -221,11 +224,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 }
 
                 // ボスの攻撃処理
-                if(gameCount > 200){
+                if(gameCount > 201){
                     if(i != 0 && object.get(i).objectType == 6 && bossBulletTime < 1) {
-                        //TODO: levelで攻撃を制御
-                        ma.updateHealth(object.get(i).health);
+                        //TODO: Healthによって特殊技が合ってもいいかも
 
+                        // 体力の描画
+                        ma.updateHealth(object.get(i).health);
                         // 体力が減ると攻撃速度が上がる
                         if(object.get(i).health < 100) {
                             bossFireBullet(i,4);
@@ -240,8 +244,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                         }
 
                         bossBulletTime = 30;
-                        //TODO: Healthによって特殊技が合ってもいいかも
-                        //TODO: POSE機能がほしいかも
                     }
                 }
 
@@ -257,19 +259,26 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             }
 
             if(gameCount > 200) bossBulletTime --;
-            if(gameCount == 200) popBoss();                    // 1600カウント後にボスを湧かせる
+            if(gameCount == 200) popBoss();                     // 1600カウント後にボスを湧かせる
             popEnemies();                                       // 敵を湧かせる
             controlFire();                                      // 弾を連続で撃てないように
             ++ gameCount;                                       // ゲーム時間を進める
             holder.unlockCanvasAndPost(canvas);
-
             if(isGameOver || isGameClear) break;                // ゲームオーバーならループを抜ける
+            // ポーズ
+            if(ma.getIsPose()){
+                while(true){
+                    if(!ma.getIsPose()){
+                        break;
+                    }
+                }
+            }
 
-            //TODO: FPS調整する
             try {
                 Thread.sleep(50);
             } catch (Exception e){}
         }
+
         if(isGameClear){
             ma.toResult(gameScore,1);   // ゲームクリア
         }else {
@@ -327,10 +336,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
     // ボスのポップ 1650秒くらい
     public void popBoss(){
+        int bossHP = 1000;
         object.add(new Boss(displayWidth,displayHeight));
         object.get(object.size() - 1)
                 .objectInit(bossBit, displayWidth / 2, -60,40,40,
-                        bossBit.getWidth(), bossBit.getHeight(), 1000);
+                        bossBit.getWidth(), bossBit.getHeight(), bossHP);
+
+        ma.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ma.displayHealth(bossHP);
+            }
+        });
     }
 
     // 射撃間隔の制御

@@ -19,11 +19,12 @@
         android:id="@+id/imagebutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="133dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:background="@null"
         android:src="@drawable/onebullet"
         android:onClick="modifyFireMode"/>
 
-    <!-- TODO -->
     <!-- スコア表示 -->
     <TextView
         android:id="@+id/scoretext"
@@ -36,17 +37,16 @@
         android:textColor="@color/white"
         android:textSize="14pt" />
 
-
+    <!-- health表示 -->
     <ProgressBar
         android:id="@+id/hpBar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:progressDrawable="@drawable/hpbar"
-        android:layout_weight="1"
-        android:layout_height="16pt"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="43dp"
-        android:layout_marginEnd="115dp"
-        />
+        android:layout_height="8pt"
+        android:layout_width="200pt"
+        android:visibility="gone"
+        android:progressDrawable="@drawable/progressbar"
+        android:layout_below="@id/scoretext"
+        android:layout_marginEnd="115dp" />
 
     <!-- タイム表示 -->
     <TextView
@@ -65,8 +65,148 @@
         android:textColor="@color/white"
         android:textSize="10pt" />
 
-    <!-- 敵の体力ゲージ -->
     <!-- 設定ボタン -->
+    <ImageButton
+        android:id="@+id/settingimagebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/timetext"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="316dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginBottom="4dp"
+        android:onClick="clickSetting"
+        android:background="@null"
+        android:src="@drawable/set" />
 
+    <!-- POSE -->
+    <TextView
+        android:id="@+id/pose"
+        android:text="POSE"
+        android:textSize="28pt"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"/>
 
+    <!-- 説明テキスト -->
+    <TableLayout
+        android:id="@+id/explanation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:layout_below="@id/pose"
+        android:background="@color/black">
+
+        <TableRow android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16pt"
+                android:layout_height="16pt"
+                android:src="@drawable/player2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="player"
+                android:textColor="@color/white"
+                android:textSize="16pt" />
+        </TableRow>
+
+        <TableRow
+            android:layout_marginTop="2pt"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16pt"
+                android:layout_height="16pt"
+                android:src="@drawable/enemy" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="enemy"
+                android:textColor="@color/white"
+                android:textSize="16pt" />
+        </TableRow>
+
+        <TableRow
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16pt"
+                android:layout_height="16pt"
+                android:src="@drawable/doublebullets" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="mode change"
+                android:textColor="@color/white"
+                android:textSize="16pt" />
+        </TableRow>
+
+        <TableRow
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16pt"
+                android:layout_height="16pt"
+                android:src="@drawable/bullet2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="player's bullet"
+                android:textColor="@color/white"
+                android:textSize="16pt" />
+        </TableRow>
+
+        <TableRow
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16pt"
+                android:layout_height="16pt"
+                android:src="@drawable/enemybullet" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="enemy's bullet"
+                android:textColor="@color/white"
+                android:textSize="16pt" />
+        </TableRow>
+
+        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="22pt"
+                android:layout_height="22pt"
+                android:src="@drawable/item" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="power up item"
+                android:textColor="@color/white"
+                android:textSize="16pt" />
+        </TableRow>
+    </TableLayout>
 </RelativeLayout>
