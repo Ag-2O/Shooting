@@ -36,20 +36,17 @@
         android:textColor="@color/white"
         android:textSize="14pt" />
 
-    <!-- HP表示 -->
-    <TextView
-        android:id="@+id/healthtext"
-        android:layout_width="200pt"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
+
+    <ProgressBar
+        android:id="@+id/hpBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:progressDrawable="@drawable/hpbar"
+        android:layout_weight="1"
+        android:layout_height="16pt"
         android:layout_marginStart="2dp"
         android:layout_marginTop="43dp"
         android:layout_marginEnd="115dp"
-        android:text="HEALTH: 0"
-        android:textColor="@color/white"
-        android:textSize="14pt" />
+        />
 
     <!-- タイム表示 -->
     <TextView

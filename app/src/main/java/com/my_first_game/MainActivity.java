@@ -18,6 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.lang.reflect.Method;
@@ -92,8 +93,11 @@ public class MainActivity extends AppCompatActivity {
 
     // ボスの体力の表示
     public void updateHealth(int health){
-        TextView scoreText = (TextView) findViewById(R.id.healthtext);
-        scoreText.setText("HEALTH: "+health);
+        //TextView scoreText = (TextView) findViewById(R.id.healthtext);
+        ProgressBar bar = (ProgressBar)findViewById(R.id.hpBar);
+        bar.setMax(1000);
+        bar.setProgress(health);
+        //scoreText.setText("HEALTH: "+health);
     }
 
     // タイムの表示
