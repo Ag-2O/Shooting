@@ -35,12 +35,12 @@ public class PlayerBullet extends Object {
         centerY = y;
         speedX = sx;
         speedY = sy;
-        imageWidth = imgw / 2;
-        imageHeight = imgh / 2 ;
+        imageWidth = (int)(imgw * size);
+        imageHeight = (int)(imgh * size);
         dead = false;
         bulletAngle = 0;
-        hitRange = new Rect((int) centerX - 20, (int) centerY - 20,
-                            (int) centerX + 20, (int) centerY + 20);
+        hitRange = new Rect((int)(centerX - 40 * size), (int)(centerY - 40 * size),
+                            (int)(centerX + 40 * size), (int)(centerY + 40 * size));
         objectType = 1;
         attack = atk;
     }
@@ -81,8 +81,8 @@ public class PlayerBullet extends Object {
         centerY += (float) Math.sin(utils.toRadian(bulletAngle - 90)) * speedY;
 
         // 当たり範囲の更新
-        hitRange = new Rect((int) centerX - 20, (int) centerY - 20,
-                (int) centerX + 20, (int) centerY + 20);
+        hitRange = new Rect((int)(centerX - 40 * size), (int)(centerY - 40 * size),
+                (int)(centerX + 40 * size), (int)(centerY + 40 * size));
 
         // 範囲外なら死
         if(isOutDisplayX(- imageWidth / 2)) dead = true;

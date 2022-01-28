@@ -90,32 +90,45 @@ public class MainActivity extends AppCompatActivity {
     public void displayHealth(int health){
         ProgressBar bar = (ProgressBar) findViewById(R.id.hpBar);
         bar.setVisibility(View.VISIBLE);
-        bar.setMax(100);
-        bar.setProgress(100 - health/10);
+        bar.setMax(10000);
+        bar.setProgress(10000 - health);
     }
 
     // ボスの体力の更新
     public void updateHealth(int health){
         ProgressBar bar = (ProgressBar)findViewById(R.id.hpBar);
-        bar.setMax(100);
-        bar.setProgress(100 - health/10);
+        bar.setMax(10000);
+        bar.setProgress(10000 - health);
     }
 
     // タイムの表示
     public void updateTime(int time){
         TextView timeText = (TextView) findViewById(R.id.timetext);
         timeText.setText("TIME: "+time);
-        if(time % 500 == 0 && time != 0){
+        if(time % 500 == 0){
             ImageButton imageButton = (ImageButton) findViewById(R.id.specialbutton);
-            imageButton.setVisibility(View.VISIBLE);
+            imageButton.setImageResource(R.drawable.buttons_special);
             isSpecialAvailable = true;
         }
+    }
+
+    // 獲得したアイテムの表示
+    public void updateItemCounts(int itemCount){
+        TextView itemText = (TextView) findViewById(R.id.itemtext);
+        itemText.setText("Item: "+itemCount);
+    }
+
+    // 攻撃力の更新
+    public void updateAttack(int attack){
+        TextView attackText = (TextView) findViewById(R.id.atktext);
+        attackText.setText("ATK: "+attack);
     }
 
     // プレイヤーが被弾したらリザルトへ
     public void toResult(int score, int clearType){
         Intent intent = new Intent(getApplicationContext(),ResultActivity.class);
         intent.putExtra("SCORE",score);
+        intent.putExtra("CLEAR_TYPE",clearType);
         startActivity(intent);
     }
 
@@ -143,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         if(isSpecialAvailable){
             isSpecial = true;
             ImageButton imageButton = (ImageButton) findViewById(R.id.specialbutton);
-            imageButton.setVisibility(View.GONE);
+            imageButton.setImageResource(R.drawable.buttons_specialno);
             isSpecialAvailable = false;
         }
     }

@@ -19,6 +19,15 @@ public class ResultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
 
+        // テキストの更新
+        int clearType = getIntent().getIntExtra("CLEAR_TYPE",0);
+        TextView endLabel = findViewById(R.id.endLabel);
+        if(clearType == 1){
+            endLabel.setText("GAME CLEAR");
+        }else{
+            endLabel.setText("GAME OVER");
+        }
+
         // スコアを表示
         TextView scoreLabel = findViewById(R.id.scoreLabel);
         int score = getIntent().getIntExtra("SCORE", 0);

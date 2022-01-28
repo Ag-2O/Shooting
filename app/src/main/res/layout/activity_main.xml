@@ -73,8 +73,7 @@
         android:layout_below="@id/imagebutton"
         android:layout_marginBottom="2dp"
         android:background="@null"
-        android:visibility="gone"
-        android:src="@drawable/buttons_special"
+        android:src="@drawable/buttons_specialno"
         android:onClick="touchSpecialButton"/>
 
     <!-- 攻撃力表示 -->

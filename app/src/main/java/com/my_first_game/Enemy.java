@@ -106,10 +106,10 @@ public class Enemy extends Object{
         if(moveNum < 10) {
             centerY += speedY;
             horizontalNum = 0;
-        }else if(moveNum > 80){
+        }else if(moveNum > 120){
             // 強化
             centerY += speedY;
-            interval -= 2;
+            interval --;
         }else if(horizontalNum < 26 * flag){
             centerX += speedX * code;
         }else{
@@ -121,7 +121,7 @@ public class Enemy extends Object{
         // 射撃
         if(interval < 0){
             isFireBullet = true;
-            interval = 20;
+            interval = 30;
         }
 
         interval --;

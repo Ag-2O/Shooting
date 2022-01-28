@@ -127,7 +127,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
         // 画像読み込み
         Resources resources = context.getResources();
-        playerBit = BitmapFactory.decodeResource(resources, R.drawable.player2);
+        playerBit = BitmapFactory.decodeResource(resources, R.drawable.player);
         bulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_green);
         pinkBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_pink);
         yellowBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_yellow);
@@ -139,8 +139,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         yellowEnemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_yellow);
 
         itemBit = BitmapFactory.decodeResource(resources, R.drawable.items_energy);
-        enemyBulletBit = BitmapFactory.decodeResource(resources, R.drawable.enemybullet);
-        trackingBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullet);
+        enemyBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_enemy);
+        trackingBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_default);
         bossBit = BitmapFactory.decodeResource(resources, R.drawable.boss);
 
         //TODO: 爆発のアニメーションを作れ
@@ -219,7 +219,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
             // プレイヤーの処理
             object.get(0).bulletStatus = ma.getFireMode();      // 射撃モードの更新
-            object.get(0).isSpecial = ma.getIsSpecial();        // 必殺状態かどうか
+            object.get(0).isSpecial = ma.getIsSpecial();
+            if(object.get(0).isSpecial) fireSpecialBullet();    // 必殺
             if(isTap) fireBullet();                             // タップ中なら射撃
 
             // オブジェクトの処理
@@ -236,21 +237,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     if(i != 0 && object.get(i).objectType == 6 && bossBulletTime < 1) {
                         //TODO: Healthによって特殊技が合ってもいいかも
                         //TODO: メインスレッド処理なのにここは通るのなぜ？
-
                         ma.updateHealth(object.get(i).health);  // 体力の描画
-                        // 体力が減ると攻撃速度が上がる
-                        if(object.get(i).health < 100) {
-                            bossFireBullet(i,4);
-                        } else if(object.get(i).health < 300) {
-                            bossFireBullet(i,3);
-                        } else if(object.get(i).health < 500){
-                            bossFireBullet(i,2);
-                        } else if(object.get(i).health < 700){
-                            bossFireBullet(i,1);
-                        } else{
-                            bossFireBullet(i,0);
-                        }
-
+                        bossSpecialFire(i,object.get(i).health);  // 体力に応じた攻撃
                         bossBulletTime = 30;
                     }
                 }
@@ -263,14 +251,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 if(object.get(i).objectType == 2) count++;      // 敵オブジェクトを数える
                 if(object.get(i).isDead()) object.remove(i);    // 範囲外なら弾を消去
 
-                ma.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ma.updateScore(gameScore);              // スコア更新
-                        ma.updateTime(gameCount);               // ゲーム時間更新
-                    }
-                });
             }
+
+            // メインスレッドでの処理
+            ma.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ma.updateScore(gameScore);                  // スコア更新
+                    ma.updateTime(gameCount);                   // ゲーム時間更新
+                    ma.updateItemCounts(itemCount);             // アイテムカウントの更新
+                    ma.updateAttack(playerATK);                 // 攻撃力の更新
+                }
+            });
 
             if(gameCount > bossTime) bossBulletTime --;
             if(gameCount == bossTime) popBoss();                // 1600カウント後にボスを湧かせる
@@ -298,9 +290,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             @Override
             public void run() {
                 if(isGameClear){
-                    ma.toResult(gameScore,1);   // ゲームクリア
+                    ma.toResult(gameScore,1);       // ゲームクリア
                 }else {
-                    ma.toResult(gameScore,0);     // ゲームオーバー
+                    ma.toResult(gameScore,0);       // ゲームオーバー
                 }
             }
         });
@@ -368,7 +360,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                             .objectInit(enemyBit, displayWidth / 2, -60, 20, 20,
                                     enemyBit.getWidth(), enemyBit.getHeight(), 0, 0,
                                     enemyPop[enemyPopNum].enemyMoveS, enemyPop[enemyPopNum].enemyMoveR,
-                                    enemyPop[enemyPopNum].enemyMoveC, 10*level);
+                                    enemyPop[enemyPopNum].enemyMoveC, 15*level);
                     ++enemyPopNum;
                 }else if(rand == 1){
                     // green
@@ -377,7 +369,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                             .objectInit(greenEnemyBit, displayWidth / 2, -60, 20, 20,
                                     greenEnemyBit.getWidth(), greenEnemyBit.getHeight(), 1, 0,
                                     enemyPop[enemyPopNum].enemyMoveS, enemyPop[enemyPopNum].enemyMoveR,
-                                    enemyPop[enemyPopNum].enemyMoveC, 20*level);
+                                    enemyPop[enemyPopNum].enemyMoveC, 15*level);
                     ++enemyPopNum;
                 }else if(rand == 2){
                     // pink
@@ -386,16 +378,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                             .objectInit(pinkEnemyBit, displayWidth / 2, -60, 20, 20,
                                     pinkEnemyBit.getWidth(), pinkEnemyBit.getHeight(), 2, 0,
                                     enemyPop[enemyPopNum].enemyMoveS, enemyPop[enemyPopNum].enemyMoveR,
-                                    enemyPop[enemyPopNum].enemyMoveC, 20*level);
+                                    enemyPop[enemyPopNum].enemyMoveC, 15*level);
                     ++enemyPopNum;
                 }else{
                     // yellow
                     object.add(new Enemy(displayWidth, displayHeight));
                     object.get(object.size() - 1)
-                            .objectInit(pinkEnemyBit, displayWidth / 2, -60, 20, 20,
+                            .objectInit(yellowEnemyBit, displayWidth / 2, -60, 20, 20,
                                     yellowEnemyBit.getWidth(), yellowEnemyBit.getHeight(), 3, 0,
                                     enemyPop[enemyPopNum].enemyMoveS, enemyPop[enemyPopNum].enemyMoveR,
-                                    enemyPop[enemyPopNum].enemyMoveC, 20*level);
+                                    enemyPop[enemyPopNum].enemyMoveC, 25*level);
                     ++enemyPopNum;
                 }
             }
@@ -457,15 +449,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
     // 弾を撃つ
     public void fireBullet(){
-        // 必殺の処理が優先
-        if(object.get(0).isSpecial){
-            object.add(new PlayerBullet(displayWidth, displayHeight,4.0));
-            object.get(object.size() - 1).objectInit(specialBulletBit, object.get(0).centerX,
-                    object.get(0).centerY - playerBit.getHeight(),
-                    0, 15, specialBulletBit.getWidth(),
-                    specialBulletBit.getHeight(), playerATK*20);
-        }
-
         // 緑
         if(object.get(0).bulletStatus == 0){
             object.add(new PlayerBullet(displayWidth, displayHeight));
@@ -473,12 +456,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     object.get(0).centerY - playerBit.getHeight(),
                     0, 75, bulletBit.getWidth(),
                     bulletBit.getHeight(), playerATK);
+            object.get(object.size() - 1).bulletStatus = 0;
 
             object.add(new PlayerBullet(displayWidth, displayHeight));
             object.get(object.size() - 1).objectInit(bulletBit, object.get(0).centerX + 40,
                     object.get(0).centerY - playerBit.getHeight(),
                     0, 75, bulletBit.getWidth(),
                     bulletBit.getHeight(), playerATK);
+            object.get(object.size() - 1).bulletStatus = 0;
         }
 
         // 赤
@@ -488,12 +473,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     object.get(0).centerY - playerBit.getHeight(),
                     0, 75, pinkBulletBit.getWidth(),
                     pinkBulletBit.getHeight(), playerATK);
+            object.get(object.size() - 1).bulletStatus = 1;
 
             object.add(new PlayerBullet(displayWidth, displayHeight));
             object.get(object.size() - 1).objectInit(pinkBulletBit, object.get(0).centerX + 40,
                     object.get(0).centerY - playerBit.getHeight(),
                     0, 75, pinkBulletBit.getWidth(),
                     pinkBulletBit.getHeight(), playerATK);
+            object.get(object.size() - 1).bulletStatus = 1;
         }
 
         // 黄色
@@ -503,12 +490,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     object.get(0).centerY - playerBit.getHeight(),
                     0, 75, yellowBulletBit.getWidth(),
                     yellowBulletBit.getHeight(), playerATK);
+            object.get(object.size() - 1).bulletStatus = 2;
 
             object.add(new PlayerBullet(displayWidth, displayHeight));
             object.get(object.size() - 1).objectInit(yellowBulletBit, object.get(0).centerX + 40,
                     object.get(0).centerY - playerBit.getHeight(),
                     0, 75, yellowBulletBit.getWidth(),
                     yellowBulletBit.getHeight(), playerATK);
+            object.get(object.size() - 1).bulletStatus = 2;
+        }
+    }
+
+    // 必殺
+    public void fireSpecialBullet(){
+        // 普通のとは別に撃つ
+        if(object.get(0).isSpecial){
+            object.add(new PlayerBullet(displayWidth, displayHeight,3.0));
+            object.get(object.size() - 1).objectInit(specialBulletBit, object.get(0).centerX,
+                    object.get(0).centerY - playerBit.getHeight(),
+                    0, 15, specialBulletBit.getWidth(),
+                    specialBulletBit.getHeight(), playerATK * 20);
+            object.get(object.size() - 1).bulletStatus = 4;
+            object.get(0).isSpecial = false;
         }
     }
 
@@ -543,14 +546,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         // 高速追尾2連
         else{
             object.add(new EnemyBullet(displayWidth, displayHeight));
-            object.get(object.size() - 1).objectInit(trackingBulletBit, object.get(i).centerX - 20,
-                    object.get(i).centerY + trackingBulletBit.getHeight() / 2,
-                    30, 30, trackingBulletBit.getWidth(),
-                    trackingBulletBit.getHeight(), 0, object.get(0).centerX,
-                    object.get(0).centerY);
-
-            object.add(new EnemyBullet(displayWidth, displayHeight));
-            object.get(object.size() - 1).objectInit(trackingBulletBit, object.get(i).centerX + 20,
+            object.get(object.size() - 1).objectInit(trackingBulletBit, object.get(i).centerX,
                     object.get(i).centerY + trackingBulletBit.getHeight() / 2,
                     30, 30, trackingBulletBit.getWidth(),
                     trackingBulletBit.getHeight(), 0, object.get(0).centerX,
@@ -568,14 +564,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 enemyBulletBit.getHeight(), 0);
 
         object.add(new EnemyBullet(displayWidth, displayHeight));
-        object.get(object.size() - 1).objectInit(enemyBulletBit, object.get(i).centerX,
+        object.get(object.size() - 1).objectInit(enemyBulletBit, object.get(i).centerX + 150,
                 object.get(i).centerY + enemyBit.getHeight() / 2,
                 0, -20, enemyBulletBit.getWidth(),
                 enemyBulletBit.getHeight(), 0);
 
         if(level > 2) {
             object.add(new EnemyBullet(displayWidth, displayHeight));
-            object.get(object.size() - 1).objectInit(enemyBulletBit, object.get(i).centerX + 150,
+            object.get(object.size() - 1).objectInit(enemyBulletBit, object.get(i).centerX,
                     object.get(i).centerY + enemyBit.getHeight() / 2,
                     0, -20, enemyBulletBit.getWidth(),
                     enemyBulletBit.getHeight(), 0);
@@ -618,6 +614,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         }
     }
 
+    public void bossSpecialFire(int i, int health){
+        //TODO: 体力に応じた特殊攻撃の実装
+
+
+        // 体力が減ると攻撃速度が上がる
+        if(health < 1000) {
+            bossFireBullet(i,4);
+        } else if(health < 3000) {
+            bossFireBullet(i,3);
+        } else if(health < 5000){
+            bossFireBullet(i,2);
+        } else if(health < 7000){
+            bossFireBullet(i,1);
+        } else{
+            bossFireBullet(i,0);
+        }
+
+    }
+
     //　被弾の処理
     public void judgeHit(ArrayList<Object> object, int i){
         //Log.d("judgeHit","executed");
@@ -627,7 +642,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 // 被弾したらオブジェクトを削除
                 if(isHitRange(object.get(i).hitRange, object.get(j).hitRange)){
                     // 弾の削除
-                    object.get(i).dead = true;
+                    if(object.get(i).bulletStatus != 4) object.get(i).dead = true;
 
                     // healthが無くなったら撃破
                     if(object.get(j).health < 0) {
@@ -638,11 +653,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                         gameScore += 1;
                         // 属性別の処理
                         if(object.get(i).bulletStatus + 1 == object.get(j).bulletStatus){
-                            object.get(j).health -= object.get(0).attack * 2;
+                            object.get(j).health -= object.get(i).attack * 2;
                         }else{
-                            object.get(j).health -= object.get(0).attack;
+                            object.get(j).health -= object.get(i).attack;
                         }
-
                     }
                 }
             }
@@ -662,10 +676,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                         isGameClear = true; // ゲームクリアフラグ
                     }else{
                         gameScore += 10;
-                        object.get(j).health -= object.get(0).attack;
+                        object.get(j).health -= object.get(i).attack;
                         bossBulletTime --;  // 攻撃するほど敵の弾が増えるように
                     }
-
                 }
             }
 
@@ -678,10 +691,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     itemCount += 1;
 
                     //アイテムによる強化
-                    if(itemCount > 30){
-                        itemCount = 0;
-                        playerATK += 1;
-                    }
+                    if(itemCount != 0 && itemCount % 20 == 0) playerATK += 1;
                 }
             }
 
