@@ -1,19 +1,19 @@
-# Shooting　![player2](https://user-images.githubusercontent.com/80666305/150777971-e72c2735-7af9-4d34-a511-e17202a8f546.png)
+# Shooting　![player](https://user-images.githubusercontent.com/80666305/150777971-e72c2735-7af9-4d34-a511-e17202a8f546.png)
 敵の弾を避けつつ、攻撃するシューティングゲームです。  
-敵には体力が設定されているため、1回当てただけでは撃破になりません。  
-敵を撃破するとパワーアップアイテムが出現し、これを取得すると、プレイヤーが放つ弾の威力が高くなります。
-敵が放つ弾は3種類あり、直進する弾と自機狙い弾、ばらまき弾があります。
+敵には体力が設定されているため、1回当てただけでは倒せません。削りましょう。  
+敵を倒すとパワーアップアイテムが出現し、これを取得すると、プレイヤーが放つ弾の威力が高くなります。
+敵は5種類存在し、ボス以外は属性を持っています。  
+この属性にあった弾で攻撃することで効率良く倒すことができます。  
 
 # Google Store URL
 TBD  
 
 # TODO
-・オリジナリティの追加
-・アイテムによる強化の処理の実装  
-・敵の動きの多様化  
+・オリジナリティの追加  
 ・爆発のアニメーションの追加  
-・弾の移動処理のNullPointerException
-・デバッグ
+・弾の移動処理のNullPointerException  
+・デバッグ  
+・ステージ選択、難易度選択
 
 # 開発環境
 Android Studio Arctic Fox | 2020.3.1 Patch 4  
@@ -23,11 +23,7 @@ VM: OpenJDK 64-Bit Server VM by Oracle Corporation
 Windows 10 10.0  
 
 # 参考文献
-https://qiita.com/croquette0212/items/24dc2b6de3730e831aab  
-http://android-note.open-memo.net/sub/other_view__get_view_size.html  
-http://androidn.hannnari.com/link200-shooting-2.html  
-https://stackoverflow.com/questions/26160442/settext-cannot-resolve-method  
-https://akira-watson.com/android/imagebutton.html  
+https://qiita.com/croquette0212/items/24dc2b6de3730e831aab
 https://hakoniwadesign.com/?page_id=4318  
   
 # フォント素材
