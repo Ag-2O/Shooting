@@ -19,13 +19,13 @@ public class Item extends Object{
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh) {}
     @Override
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs){
-        image = new BitmapDrawable(resizeImage(bitImage, 2.0));
+        image = new BitmapDrawable(bitImage);
         centerX = x;
         centerY = y;
         speedX = sx;
         speedY = sy;
-        imageWidth = imgw * 2;
-        imageHeight = imgh * 2;
+        imageWidth = imgw;
+        imageHeight = imgh;
         dead = false;
         bulletStatus = bs;
         hitRange = new Rect((int) centerX - 30, (int) centerY - 30,

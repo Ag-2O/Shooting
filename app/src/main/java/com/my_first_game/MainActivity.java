@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.graphics.PixelFormat;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceView;
@@ -29,14 +30,12 @@ import java.lang.reflect.Method;
  */
 
 public class MainActivity extends AppCompatActivity {
-    // 画面幅と高さ
-    public int gvWidth, gvHeight;
-    // 射撃モード(0-3)
-    public int fireMode = 0;
-    // 設定画面
-    public boolean isSetting = false;
-    // surfaces
-    public GameView gv;
+    public int gvWidth, gvHeight;       // 画面幅と高さ
+    public int fireMode = 0;            // 射撃モード(0-3)
+    public boolean isSetting = false;   // 設定画面
+    public GameView gv;                 // surfaces
+    public boolean isSpecialAvailable = false;   // 必殺が撃てるかどうか
+    public boolean isSpecial = false;   // スペシャルボタンを押したかどうか
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,19 +70,14 @@ public class MainActivity extends AppCompatActivity {
         ImageButton imageButton = (ImageButton) findViewById(R.id.imagebutton);
         if(fireMode == 0){
             fireMode = 1;
-            imageButton.setImageResource(R.drawable.doublebullets);
+            imageButton.setImageResource(R.drawable.buttons_pink);
         }else if (fireMode == 1){
             fireMode = 2;
-            imageButton.setImageResource(R.drawable.circlebullets);
+            imageButton.setImageResource(R.drawable.buttons_yellow);
         }else{
             fireMode = 0;
-            imageButton.setImageResource(R.drawable.onebullet);
+            imageButton.setImageResource(R.drawable.buttons_green);
         }
-    }
-
-    // 射撃モードを返す
-    public int getFireMode(){
-        return fireMode;
     }
 
     // スコアの表示
@@ -111,6 +105,11 @@ public class MainActivity extends AppCompatActivity {
     public void updateTime(int time){
         TextView timeText = (TextView) findViewById(R.id.timetext);
         timeText.setText("TIME: "+time);
+        if(time % 500 == 0 && time != 0){
+            ImageButton imageButton = (ImageButton) findViewById(R.id.specialbutton);
+            imageButton.setVisibility(View.VISIBLE);
+            isSpecialAvailable = true;
+        }
     }
 
     // プレイヤーが被弾したらリザルトへ
@@ -121,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 設定ボタンのクリック
-    public void clickSetting(View view){
+    public void touchSetting(View view){
         TableLayout tableLayout = (TableLayout) findViewById(R.id.explanation);
         ImageButton imageButton = (ImageButton) findViewById(R.id.settingimagebutton);
         TextView textView = (TextView) findViewById(R.id.pose);
@@ -139,8 +138,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // 必殺ボタンのクリック
+    public void touchSpecialButton(View view){
+        if(isSpecialAvailable){
+            isSpecial = true;
+            ImageButton imageButton = (ImageButton) findViewById(R.id.specialbutton);
+            imageButton.setVisibility(View.GONE);
+            isSpecialAvailable = false;
+        }
+    }
+
+    // 射撃モードを返す
+    public int getFireMode(){
+        return fireMode;
+    }
+
     // poseかどうかを返す
     public boolean getIsPose(){
         return isSetting;
+    }
+
+    // 必殺かどうかを返す
+    public boolean getIsSpecial(){
+        boolean tmp = isSpecial;
+        if(isSpecial) isSpecial = false;
+        return tmp;
     }
 }

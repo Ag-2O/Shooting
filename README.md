@@ -6,6 +6,7 @@
 
 # Google Store URL
 TBD  
+
 # TODO
 ・オリジナリティの追加
 ・アイテムによる強化の処理の実装  

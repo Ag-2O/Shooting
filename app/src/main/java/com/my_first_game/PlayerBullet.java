@@ -14,18 +14,23 @@ import android.util.Log;
 import java.util.ArrayList;
 
 public class PlayerBullet extends Object {
+    public double size = 0.5;       // 弾の倍率
     // コンストラクタ
     public PlayerBullet(){}
     public PlayerBullet(float dw, float dh){
         super(dw,dh);
+    }
+    public PlayerBullet(float dw, float dh, double s){
+        super(dw,dh);
+        size = s;
     }
 
     // 初期化
     @Override
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh) {}
     @Override
-    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int angle) {
-        image = new BitmapDrawable(resizeImage(bitImage, 0.5));
+    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int atk) {
+        image = new BitmapDrawable(resizeImage(bitImage, size));
         centerX = x;
         centerY = y;
         speedX = sx;
@@ -33,11 +38,11 @@ public class PlayerBullet extends Object {
         imageWidth = imgw / 2;
         imageHeight = imgh / 2 ;
         dead = false;
-        bulletAngle = angle;
+        bulletAngle = 0;
         hitRange = new Rect((int) centerX - 20, (int) centerY - 20,
                             (int) centerX + 20, (int) centerY + 20);
         objectType = 1;
-        attack = 1;
+        attack = atk;
     }
     @Override
     public void objectInit(Bitmap[] bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs) {}

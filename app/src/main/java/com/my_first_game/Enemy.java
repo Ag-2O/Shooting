@@ -5,6 +5,8 @@ package com.my_first_game;
  */
 
 import java.util.ArrayList;
+import java.util.Random;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,6 +16,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 
 public class Enemy extends Object{
+    private int moveNum = 0;        // 行動制御する変数
+    private int horizontalNum = 0;  // 水平方向の移動のカウント
+    private int code = 1;           // 符号反転
+    private int flag = 1;
+    private int interval = 20;       // 射撃間隔
+    Random random = new Random();
+
     // コンストラクタ
     public Enemy(){}
     public Enemy(float dw, float dh){
@@ -71,6 +80,8 @@ public class Enemy extends Object{
         objectType = 2;
         //Log.d("Enemy objectInit","health: "+health);
         health = hp;
+
+        if(random.nextBoolean()) code = -1;
     }
 
     // 描画
@@ -91,21 +102,34 @@ public class Enemy extends Object{
     // 移動
     @Override
     public void objectMove() {
-        if(moveCount != enemyMoveS.size()){
-            double tx = Math.cos(utils.toRadian(enemyMoveR.get(moveCount) - 90)) *
-                        enemyMoveS.get(moveCount);
-            double ty = Math.sin(utils.toRadian(enemyMoveR.get(moveCount) - 90)) *
-                        enemyMoveS.get(moveCount);
-            centerX += tx;
-            centerY += ty;
-            hitRange = new Rect((int) centerX - 60,(int) centerY - 60,
-                                (int) centerX + 60, (int) centerY + 60);
-            if(enemyPopCount == enemyMoveC.get(moveCount)){
-                ++ moveCount;
-                isFireBullet = true;    // 射撃
-            }
+        // 上からきてレレレ
+        if(moveNum < 10) {
+            centerY += speedY;
+            horizontalNum = 0;
+        }else if(moveNum > 80){
+            // 強化
+            centerY += speedY;
+            interval -= 2;
+        }else if(horizontalNum < 26 * flag){
+            centerX += speedX * code;
+        }else{
+            horizontalNum = 0;
+            code *= -1;
+            flag = 2;
         }
-        ++ enemyPopCount;
+
+        // 射撃
+        if(interval < 0){
+            isFireBullet = true;
+            interval = 20;
+        }
+
+        interval --;
+        moveNum++;
+        horizontalNum++;
+
+        hitRange = new Rect((int) centerX - 60, (int) centerY - 60,
+                (int) centerX + 60, (int) centerY + 60);
 
         // 範囲外なら死
         if(isOutDisplayX(- imageWidth / 2)) dead = true;

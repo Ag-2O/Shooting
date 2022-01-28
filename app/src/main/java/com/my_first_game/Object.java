@@ -27,7 +27,7 @@ public abstract class Object {
     public int bulletAngle;                     // 弾の画像の角度
     public Rect hitRange;                       // オブジェクトの当たり判定
     public int objectType;                      // オブジェクトの種類
-    // 0:プレイヤー、1:プレイヤーの弾、2:敵、3:爆発、4:アイテム
+    public boolean isSpecial = false;           // 必殺状態かどうか
 
     // 爆発
     public Drawable[] explosions = new Drawable[4];
