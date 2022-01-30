@@ -7,6 +7,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.media.AudioAttributes;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.graphics.PixelFormat;
 import android.provider.ContactsContract;
@@ -36,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     public GameView gv;                 // surfaces
     public boolean isSpecialAvailable = false;   // 必殺が撃てるかどうか
     public boolean isSpecial = false;   // スペシャルボタンを押したかどうか
+    private SoundPool soundPool;        // 音声設定
+    private int enterSound;             // 決定ボタン/メニューボタンの効果音
+    private int modeChangeSound;        // モード変更ボタンの効果音
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +54,9 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         WindowManager manager = window.getWindowManager();
         Display display = manager.getDefaultDisplay();
-        gvWidth = display.getWidth();
-        gvHeight = display.getHeight();
+        gvWidth = display.getWidth();   // 画面横
+        gvHeight = display.getHeight(); // 画面高さ
+        setSounds();                    // 音声設定
 
         setContentView(R.layout.activity_main);
     }
@@ -65,9 +71,26 @@ public class MainActivity extends AppCompatActivity {
         Log.v("onWindowFocusChanged", "width=" + gvWidth + ", height=" + gvHeight);
     }
 
+    public void setSounds(){
+        // 音声設定
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build();
+
+        soundPool = new SoundPool.Builder()
+                .setAudioAttributes(audioAttributes)
+                .build();
+
+        // 音声読み込み
+        enterSound = soundPool.load(this, R.raw.enter, 1);
+        modeChangeSound = soundPool.load(this, R.raw.modechange, 1);
+    }
+
     // 射撃モード変更
     public void modifyFireMode(View view){
         ImageButton imageButton = (ImageButton) findViewById(R.id.imagebutton);
+        soundPool.play(modeChangeSound, 1.0f, 1.0f, 1, 0, 1);
         if(fireMode == 0){
             fireMode = 1;
             imageButton.setImageResource(R.drawable.buttons_pink);
@@ -134,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 設定ボタンのクリック
     public void touchSetting(View view){
+        soundPool.play(enterSound, 1.0f, 1.0f, 1, 0, 1);
         TableLayout tableLayout = (TableLayout) findViewById(R.id.explanation);
         ImageButton imageButton = (ImageButton) findViewById(R.id.settingimagebutton);
         TextView textView = (TextView) findViewById(R.id.pose);
@@ -153,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 必殺ボタンのクリック
     public void touchSpecialButton(View view){
+        soundPool.play(modeChangeSound, 1.0f, 1.0f, 1, 0, 1);
         if(isSpecialAvailable){
             isSpecial = true;
             ImageButton imageButton = (ImageButton) findViewById(R.id.specialbutton);

@@ -18,6 +18,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -55,6 +59,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     private Bitmap trackingBulletBit;   // 5:敵の弾
     private Bitmap bossBit;             // 6:ボス
     private Bitmap specialBulletBit;    // 7:ULT
+
+    // 効果音
+    private SoundPool soundPool;
+    private int playerFireSound;
+    private int enemyFireSound;
+    private int explosionSound;
+    private int powerUpSound;
+    private int getItemSound;
+    private int enterSound;
 
     // 爆発
     private Bitmap[] explosionBits = new Bitmap[4];
@@ -151,8 +164,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             if(i == 3) explosionBits[i] = BitmapFactory.decodeResource(resources, R.drawable.explosion);
         }
 
-        //TODO:敵の画像を増やしてもいいかもしれない
-        //TODO:爆発や弾の種類も増やしてもいいかも
+        // 音声読み込み
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build();
+
+        soundPool = new SoundPool.Builder()
+                .setAudioAttributes(audioAttributes)
+                .setMaxStreams(4)
+                .build();
+
+        playerFireSound = soundPool.load(context, R.raw.shotplayer, 1);
+        enemyFireSound = soundPool.load(context, R.raw.shotenemy, 1);
+        explosionSound = soundPool.load(context, R.raw.explosion, 1);
+        powerUpSound = soundPool.load(context, R.raw.powerup, 1);
+        getItemSound = soundPool.load(context, R.raw.getitem, 1);
+        enterSound = soundPool.load(context, R.raw.enter, 1);
 
         // プレイヤーオブジェクトの生成
         object.add(new Player(displayWidth,displayHeight));
@@ -431,6 +459,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                             object.get(i).centerY, 0, 0,
                             explosionBits[0].getWidth(),
                             explosionBits[0].getHeight(), 0);
+            soundPool.play(explosionSound, 1.0f, 1.0f, 0,0,1);
         }
     }
 
@@ -499,6 +528,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     yellowBulletBit.getHeight(), playerATK);
             object.get(object.size() - 1).bulletStatus = 2;
         }
+        soundPool.play(playerFireSound, 1.0f, 1.0f, 0,0,1);
     }
 
     // 必殺
@@ -513,6 +543,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             object.get(object.size() - 1).bulletStatus = 4;
             object.get(0).isSpecial = false;
         }
+        soundPool.play(playerFireSound, 1.0f, 1.0f, 0,0,1);
     }
 
     // 敵が弾を撃つ
@@ -524,6 +555,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     object.get(i).centerY + enemyBit.getHeight() / 2,
                     0, -30, enemyBulletBit.getWidth(),
                     enemyBulletBit.getHeight(), 0);
+            soundPool.play(enemyFireSound, 1.0f, 1.0f, 0,0,1);
         }
         // 追尾する弾
         else if(object.get(i).bulletStatus == 1){
@@ -533,6 +565,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     20, 20, trackingBulletBit.getWidth(),
                     trackingBulletBit.getHeight(), 0, object.get(0).centerX,
                     object.get(0).centerY);
+            soundPool.play(enemyFireSound, 1.0f, 1.0f, 0,0,1);
         }
         // ばらまき
         else if(object.get(i).bulletStatus == 2){
@@ -541,7 +574,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 object.get(object.size() - 1).objectInit(trackingBulletBit, object.get(i).centerX,
                         object.get(i).centerY, 30, 30, trackingBulletBit.getWidth(),
                         trackingBulletBit.getHeight(), j*(360/6));
+
             }
+            soundPool.play(enemyFireSound, 1.0f, 1.0f, 0,0,1);
         }
         // 高速追尾2連
         else{
@@ -551,6 +586,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     30, 30, trackingBulletBit.getWidth(),
                     trackingBulletBit.getHeight(), 0, object.get(0).centerX,
                     object.get(0).centerY);
+            soundPool.play(enemyFireSound, 1.0f, 1.0f, 0,0,1);
         }
     }
 
@@ -577,6 +613,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     enemyBulletBit.getHeight(), 0);
         }
 
+        soundPool.play(enemyFireSound, 1.0f, 1.0f, 0,0,1);
+
         // 確率でばらまきか追尾
         if(level > 0){
             for(int j = 0; j < 20; j++){
@@ -586,6 +624,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                         trackingBulletBit.getHeight(), j*(360/20));
             }
         }
+
+        soundPool.play(enemyFireSound, 1.0f, 1.0f, 0,0,1);
 
         // 追尾する弾
         if(level > 1){
@@ -612,11 +652,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                         object.get(0).centerY);
             }
         }
+        soundPool.play(enemyFireSound, 1.0f, 1.0f, 0,0,1);
     }
 
     public void bossSpecialFire(int i, int health){
         //TODO: 体力に応じた特殊攻撃の実装
-
 
         // 体力が減ると攻撃速度が上がる
         if(health < 1000) {
@@ -689,9 +729,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     gameScore += 50;
                     object.get(j).dead = true;
                     itemCount += 1;
+                    soundPool.play(getItemSound, 1.0f, 1.0f, 0,0,1);
 
                     //アイテムによる強化
-                    if(itemCount != 0 && itemCount % 20 == 0) playerATK += 1;
+                    if(itemCount != 0 && itemCount % 20 == 0){
+                        playerATK += 1;
+                        soundPool.play(powerUpSound, 1.0f, 1.0f, 0,0,1);
+                    }
                 }
             }
 

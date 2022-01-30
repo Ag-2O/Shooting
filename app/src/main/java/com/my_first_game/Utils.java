@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.media.MediaPlayer;
 import android.util.Log;
 
 import java.security.spec.ECField;
@@ -51,5 +52,11 @@ public class Utils {
         //Log.d("drawHitRange","executed");
         Paint paint = new Paint();
         paint.setColor(Color.RED);
+    }
+
+    // 効果音再生
+    public void playSound(MediaPlayer mp){
+        mp.seekTo(0);
+        mp.start();
     }
 }
