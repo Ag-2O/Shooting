@@ -7,8 +7,7 @@
 ![enemies_green](https://user-images.githubusercontent.com/80666305/151593010-b9802eb6-db62-416e-8cd8-642a488f9949.png)
 ![enemies_pink](https://user-images.githubusercontent.com/80666305/151593046-ce2f760c-059a-467f-ace0-5abc0b1a613e.png)
 ![enemies_yellow](https://user-images.githubusercontent.com/80666305/151593062-c8ccfca6-237f-4087-bc76-fd3422104a42.png)
-![boss](https://user-images.githubusercontent.com/80666305/151593795-c399f0b2-c5cc-49f0-9503-0a293958313f.png)
-
+![boss](https://user-images.githubusercontent.com/80666305/151593795-c399f0b2-c5cc-49f0-9503-0a293958313f.png)  
 この属性にあった弾で攻撃することで効率良く倒すことができます。  
 <img src = "https://user-images.githubusercontent.com/80666305/151593160-6d6b89cc-9c9d-44fe-a096-7a0938cc37b3.png" width="150">
 
@@ -36,3 +35,7 @@ https://qiita.com/croquette0212/items/24dc2b6de3730e831aab
   
 # フォント素材
 https://itouhiro.hatenablog.com/entry/20130602/font  
+
+# 音声素材
+https://maou.audio/category/se/  
+https://soundeffect-lab.info/
