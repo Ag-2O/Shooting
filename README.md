@@ -16,6 +16,8 @@
 TBD  
 
 # TODO
+・操作性  
+・カクつき  
 ・オリジナリティの追加  
 ・爆発のアニメーションの追加  
 ・弾の移動処理のNullPointerException  
