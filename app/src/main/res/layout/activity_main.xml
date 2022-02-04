@@ -51,16 +51,11 @@
     <!-- タイム表示 -->
     <TextView
         android:id="@+id/timetext"
-        android:layout_width="50pt"
+        android:layout_width="200pt"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="720dp"
-        android:layout_marginEnd="279dp"
-        android:layout_marginBottom="6dp"
         android:text="@string/timeText"
         android:textColor="@color/white"
         android:textSize="10pt" />

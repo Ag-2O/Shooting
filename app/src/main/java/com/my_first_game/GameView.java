@@ -78,33 +78,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     private int bulletTime;
     private int bossBulletTime = 5;
 
-    // ボスのリミッター
-    private int bossLimiter = 0;
-
     // アイテムのカウント
     public int itemCount = 1;
 
     // タップしているかどうか
     private boolean isTap;
 
-    // 敵
-    private static final int enemyNum = 100;
-    private int[] enemyPopCount = new int[enemyNum];
-    private EnemyPop[] enemyPop = new EnemyPop[enemyNum];
-
-    // 敵を上部で停滞させるための動きリスト
-    private ArrayList<Integer> enemyPopR = new ArrayList();
-    private ArrayList<Integer> enemyPopC = new ArrayList();
-    private ArrayList<Integer> enemyPopS = new ArrayList();
-
-    private int enemyPopNum;            // 湧いた敵の数
     private int gameCount;              // ゲームの時間
     public int gameScore = 0;           // ゲームスコア
+    public int popTime = 200;           // 敵が湧く間隔
+    public int popCount = 7;            // 敵が湧く量
     public boolean isGameOver = false;  // ゲームオーバーかどうか
     public boolean isGameClear = false; // ゲームクリアかどうか
-    public boolean isPose = false;      // ポーズ中かどうか
     public int bossTime = 1600;         // ボスが出現する時間
+    public boolean isLiveBoss = false;  // ボスが生存しているかどうか
     private int playerATK = 1;          // 攻撃力
+    private int level;                  // ゲームレベル
+    private int bossHP;                 // ボスの体力
+    private int bossMAXHP;              // ボスの最大体力
 
     // オブジェクトを格納するリスト
     private ArrayList<Object> object = new ArrayList();
@@ -194,17 +185,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         // タップ状態
         isTap = false;
 
-        // 敵オブジェクトの数
-        enemyPopNum = 0;
-
-        int c = 10;     // 湧く間隔
-        int m = 30;     // まとまりが湧く間隔
-        for(int i = 0; i < enemyNum; i++){
-            if(i % 10 == 0) m = m + 50;
-            enemyPopCount[i] = i*c + m;
-            enemyPop[i] = new EnemyPop(enemyPopCount[i], enemyPopS, enemyPopR, enemyPopC);
-        }
-
         // ゲーム時間の初期化
         gameCount = 0;
     }
@@ -252,7 +232,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             if(isTap) fireBullet();                             // タップ中なら射撃
 
             // オブジェクトの処理
-            int count = 0;
             for(int i = 0; i < object.size(); i++){
                 // 雑魚敵の攻撃処理
                 if(i != 0 && object.get(i).isFireBullet){
@@ -264,10 +243,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 if(gameCount > bossTime){
                     if(i != 0 && object.get(i).objectType == 6 && bossBulletTime < 1) {
                         //TODO: Healthによって特殊技が合ってもいいかも
-                        //TODO: メインスレッド処理なのにここは通るのなぜ？
-                        ma.updateHealth(object.get(i).health);  // 体力の描画
+                        ma.updateHealth(object.get(i).health, bossMAXHP);  // 体力の描画
                         bossSpecialFire(i,object.get(i).health);  // 体力に応じた攻撃
-                        bossBulletTime = 30;
+                        bossBulletTime = 40;
                     }
                 }
 
@@ -276,7 +254,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 judgeHit(object,i);                             // 当たり判定
                 drawExplosion(i);                               // 爆発の描画
                 drawItem(i);                                    // アイテムの描画
-                if(object.get(i).objectType == 2) count++;      // 敵オブジェクトを数える
                 if(object.get(i).isDead()) object.remove(i);    // 範囲外なら弾を消去
 
             }
@@ -292,11 +269,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 }
             });
 
-            if(gameCount > bossTime) bossBulletTime --;
-            if(gameCount == bossTime) popBoss();                // 1600カウント後にボスを湧かせる
-            popEnemies();                                       // 敵を湧かせる
+            //Log.d("MainLoop","popCount: "+ popCount);
+            Log.d("MainLoop","gameLevel: "+ level);
+            if(isLiveBoss) bossBulletTime --;                           // ボスの攻撃間隔
+            if(!isLiveBoss) if (bossTime == 0) popBoss();               // 1600カウント毎にボスを湧かせる
+            if(!isLiveBoss){
+                if(gameCount % popTime == 0) popCount = 5 + level / 2;  // popTime毎に湧き数をリセット
+                if(popCount > 0 && gameCount % 5 == 0) popEnemies();    // 敵を湧かせる
+                bossTime --;
+            }
+
             controlFire();                                      // 弾を連続で撃てないように
             ++ gameCount;                                       // ゲーム時間を進める
+            level = (gameCount / 500) + 1;                      // ゲームのレベルアップ
             holder.unlockCanvasAndPost(canvas);
             if(isGameOver || isGameClear) break;                // ゲームオーバーならループを抜ける
 
@@ -310,7 +295,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             }
 
             try {
-                Thread.sleep(50);
+                Thread.sleep(1000 / 60);
             } catch (Exception e){}
         }
 
@@ -360,81 +345,56 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
     // 敵のポップ
     public void popEnemies(){
-        // カウントが進むにつれ難易度が増す設計
-        int range = 1;
-        int level = 1;
-        if(gameCount < 200){
-            range = 1;
+        // カウントが進むにつれ難易度が増す
+        int rand = random.nextInt((level % 4) + 1);
 
-        }else if(gameCount < 400){
-            range = 2;
-            level = 2;
-        }
-        else if(gameCount < 700){
-            range = 3;
-            level = 2;
+        if(rand == 1){
+            // green
+            object.add(new Enemy(displayWidth, displayHeight));
+            object.get(object.size() - 1)
+                    .objectInit(greenEnemyBit, displayWidth / 2, -60, 20, 20,
+                            greenEnemyBit.getWidth(), greenEnemyBit.getHeight(), 1, 0,
+                            15*level);
+        }else if(rand == 2){
+            // pink
+            object.add(new Enemy(displayWidth, displayHeight));
+            object.get(object.size() - 1)
+                    .objectInit(pinkEnemyBit, displayWidth / 2, -60, 20, 20,
+                            pinkEnemyBit.getWidth(), pinkEnemyBit.getHeight(), 2, 0,
+                            15*level);
+        }else if(rand == 3){
+            // yellow
+            object.add(new Enemy(displayWidth, displayHeight));
+            object.get(object.size() - 1)
+                    .objectInit(yellowEnemyBit, displayWidth / 2, -60, 20, 20,
+                            yellowEnemyBit.getWidth(), yellowEnemyBit.getHeight(), 3, 0,
+                            25*level);
         }else{
-            range = 4;
-            level = 3;
+            // default
+            object.add(new Enemy(displayWidth, displayHeight));
+            object.get(object.size() - 1)
+                    .objectInit(enemyBit, displayWidth / 2, -60, 20, 20,
+                            enemyBit.getWidth(), enemyBit.getHeight(), 0, 0,
+                            15*level);
         }
 
-        if(enemyPopNum != enemyNum){
-            if(enemyPop[enemyPopNum].enemyPopCount == gameCount){
-                int rand = random.nextInt(range);
-                // default
-                if(rand == 0) {
-                    object.add(new Enemy(displayWidth, displayHeight));
-                    object.get(object.size() - 1)
-                            .objectInit(enemyBit, displayWidth / 2, -60, 20, 20,
-                                    enemyBit.getWidth(), enemyBit.getHeight(), 0, 0,
-                                    enemyPop[enemyPopNum].enemyMoveS, enemyPop[enemyPopNum].enemyMoveR,
-                                    enemyPop[enemyPopNum].enemyMoveC, 15*level);
-                    ++enemyPopNum;
-                }else if(rand == 1){
-                    // green
-                    object.add(new Enemy(displayWidth, displayHeight));
-                    object.get(object.size() - 1)
-                            .objectInit(greenEnemyBit, displayWidth / 2, -60, 20, 20,
-                                    greenEnemyBit.getWidth(), greenEnemyBit.getHeight(), 1, 0,
-                                    enemyPop[enemyPopNum].enemyMoveS, enemyPop[enemyPopNum].enemyMoveR,
-                                    enemyPop[enemyPopNum].enemyMoveC, 15*level);
-                    ++enemyPopNum;
-                }else if(rand == 2){
-                    // pink
-                    object.add(new Enemy(displayWidth, displayHeight));
-                    object.get(object.size() - 1)
-                            .objectInit(pinkEnemyBit, displayWidth / 2, -60, 20, 20,
-                                    pinkEnemyBit.getWidth(), pinkEnemyBit.getHeight(), 2, 0,
-                                    enemyPop[enemyPopNum].enemyMoveS, enemyPop[enemyPopNum].enemyMoveR,
-                                    enemyPop[enemyPopNum].enemyMoveC, 15*level);
-                    ++enemyPopNum;
-                }else{
-                    // yellow
-                    object.add(new Enemy(displayWidth, displayHeight));
-                    object.get(object.size() - 1)
-                            .objectInit(yellowEnemyBit, displayWidth / 2, -60, 20, 20,
-                                    yellowEnemyBit.getWidth(), yellowEnemyBit.getHeight(), 3, 0,
-                                    enemyPop[enemyPopNum].enemyMoveS, enemyPop[enemyPopNum].enemyMoveR,
-                                    enemyPop[enemyPopNum].enemyMoveC, 25*level);
-                    ++enemyPopNum;
-                }
-            }
-        }
+        popCount --;
     }
 
-    // ボスのポップ 1650秒くらい
+    // ボスのポップ 1600秒くらい
     public void popBoss(){
-        int bossHP = 10000;
+        bossMAXHP = 1000 * level;
+        isLiveBoss = true;
         object.add(new Boss(displayWidth,displayHeight));
         object.get(object.size() - 1)
                 .objectInit(bossBit, displayWidth / 2, -60,40,40,
-                        bossBit.getWidth(), bossBit.getHeight(), bossHP);
+                        bossBit.getWidth(), bossBit.getHeight(), bossMAXHP);
 
         // メインスレッド処理
         ma.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ma.displayHealth(bossHP);
+                ma.displayHealth(bossMAXHP);
             }
         });
     }
@@ -539,7 +499,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             object.get(object.size() - 1).objectInit(specialBulletBit, object.get(0).centerX,
                     object.get(0).centerY - playerBit.getHeight(),
                     0, 15, specialBulletBit.getWidth(),
-                    specialBulletBit.getHeight(), playerATK * 20);
+                    specialBulletBit.getHeight(), playerATK * 200);
             object.get(object.size() - 1).bulletStatus = 4;
             object.get(0).isSpecial = false;
         }
@@ -553,7 +513,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             object.add(new EnemyBullet(displayWidth, displayHeight));
             object.get(object.size() - 1).objectInit(enemyBulletBit, object.get(i).centerX,
                     object.get(i).centerY + enemyBit.getHeight() / 2,
-                    0, -30, enemyBulletBit.getWidth(),
+                    0, -20, enemyBulletBit.getWidth(),
                     enemyBulletBit.getHeight(), 0);
             soundPool.play(enemyFireSound, 1.0f, 1.0f, 0,0,1);
         }
@@ -572,7 +532,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             for(int j = 0; j < 6; j++){
                 object.add(new EnemyBullet(displayWidth, displayHeight));
                 object.get(object.size() - 1).objectInit(trackingBulletBit, object.get(i).centerX,
-                        object.get(i).centerY, 30, 30, trackingBulletBit.getWidth(),
+                        object.get(i).centerY, 20, 20, trackingBulletBit.getWidth(),
                         trackingBulletBit.getHeight(), j*(360/6));
 
             }
@@ -596,20 +556,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         object.add(new EnemyBullet(displayWidth, displayHeight));
         object.get(object.size() - 1).objectInit(enemyBulletBit, object.get(i).centerX - 150,
                 object.get(i).centerY + enemyBit.getHeight() / 2,
-                0, -20, enemyBulletBit.getWidth(),
+                0, -30, enemyBulletBit.getWidth(),
                 enemyBulletBit.getHeight(), 0);
 
         object.add(new EnemyBullet(displayWidth, displayHeight));
         object.get(object.size() - 1).objectInit(enemyBulletBit, object.get(i).centerX + 150,
                 object.get(i).centerY + enemyBit.getHeight() / 2,
-                0, -20, enemyBulletBit.getWidth(),
+                0, -30, enemyBulletBit.getWidth(),
                 enemyBulletBit.getHeight(), 0);
 
         if(level > 2) {
             object.add(new EnemyBullet(displayWidth, displayHeight));
             object.get(object.size() - 1).objectInit(enemyBulletBit, object.get(i).centerX,
                     object.get(i).centerY + enemyBit.getHeight() / 2,
-                    0, -20, enemyBulletBit.getWidth(),
+                    0, -30, enemyBulletBit.getWidth(),
                     enemyBulletBit.getHeight(), 0);
         }
 
@@ -620,7 +580,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             for(int j = 0; j < 20; j++){
                 object.add(new EnemyBullet(displayWidth, displayHeight));
                 object.get(object.size() - 1).objectInit(trackingBulletBit, object.get(i).centerX,
-                        object.get(i).centerY, 30, 30, trackingBulletBit.getWidth(),
+                        object.get(i).centerY, 20, 20, trackingBulletBit.getWidth(),
                         trackingBulletBit.getHeight(), j*(360/20));
             }
         }
@@ -632,14 +592,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             object.add(new EnemyBullet(displayWidth, displayHeight));
             object.get(object.size() - 1).objectInit(trackingBulletBit, object.get(i).centerX - 150,
                     object.get(i).centerY + trackingBulletBit.getHeight() / 2,
-                    10, 10, trackingBulletBit.getWidth(),
+                    20, 20, trackingBulletBit.getWidth(),
                     trackingBulletBit.getHeight(), 0, object.get(0).centerX,
                     object.get(0).centerY);
 
             object.add(new EnemyBullet(displayWidth, displayHeight));
             object.get(object.size() - 1).objectInit(trackingBulletBit, object.get(i).centerX,
                     object.get(i).centerY + trackingBulletBit.getHeight() / 2,
-                    10, 10, trackingBulletBit.getWidth(),
+                    20, 20, trackingBulletBit.getWidth(),
                     trackingBulletBit.getHeight(), 0, object.get(0).centerX,
                     object.get(0).centerY);
 
@@ -647,7 +607,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 object.add(new EnemyBullet(displayWidth, displayHeight));
                 object.get(object.size() - 1).objectInit(trackingBulletBit, object.get(i).centerX + 150,
                         object.get(i).centerY + trackingBulletBit.getHeight() / 2,
-                        10, 10, trackingBulletBit.getWidth(),
+                        20, 20, trackingBulletBit.getWidth(),
                         trackingBulletBit.getHeight(), 0, object.get(0).centerX,
                         object.get(0).centerY);
             }
@@ -661,11 +621,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         // 体力が減ると攻撃速度が上がる
         if(health < 1000) {
             bossFireBullet(i,4);
-        } else if(health < 3000) {
+        } else if(health < bossMAXHP*0.3) {
             bossFireBullet(i,3);
-        } else if(health < 5000){
+        } else if(health < bossMAXHP*0.5){
             bossFireBullet(i,2);
-        } else if(health < 7000){
+        } else if(health < bossMAXHP*0.7){
             bossFireBullet(i,1);
         } else{
             bossFireBullet(i,0);
@@ -713,7 +673,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                         gameScore += 4000;
                         object.get(j).isExplosion = true;
                         object.get(j).dead = true;
-                        isGameClear = true; // ゲームクリアフラグ
+                        isLiveBoss = false;
+                        bossTime = 1600;
                     }else{
                         gameScore += 10;
                         object.get(j).health -= object.get(i).attack;
@@ -731,7 +692,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     itemCount += 1;
                     soundPool.play(getItemSound, 1.0f, 1.0f, 0,0,1);
 
-                    //アイテムによる強化
+                    // アイテムによる強化
                     if(itemCount != 0 && itemCount % 20 == 0){
                         playerATK += 1;
                         soundPool.play(powerUpSound, 1.0f, 1.0f, 0,0,1);

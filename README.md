@@ -20,8 +20,7 @@ TBD
 ・オリジナリティの追加  
 ・爆発のアニメーションの追加  
 ・弾の移動処理のNullPointerException  
-・デバッグ  
-・ステージ選択、難易度選択
+・デバッグ
 
 # 開発環境
 Android Studio Arctic Fox | 2020.3.1 Patch 4  

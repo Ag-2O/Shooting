@@ -62,7 +62,7 @@ public class EnemyBullet extends Object{
     }
 
     @Override
-    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, ArrayList emc, ArrayList emx, ArrayList emy, int hp) {}
+    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, int hp) {}
 
     // 描画
     @Override

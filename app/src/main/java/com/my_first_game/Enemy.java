@@ -21,12 +21,15 @@ public class Enemy extends Object{
     private int code = 1;           // 符号反転
     private int flag = 1;
     private int interval = 20;       // 射撃間隔
+    private int moveWidth, moveHeight;
     Random random = new Random();
 
     // コンストラクタ
     public Enemy(){}
     public Enemy(float dw, float dh){
         super(dw,dh);
+        moveWidth = (int)(dw / 45);
+        moveHeight = (int)(dh / 200);
     }
 
     // 初期化
@@ -39,8 +42,8 @@ public class Enemy extends Object{
         enemyPopCount = 0;
         enemyMoveCount = 0;
 
-        centerX = utils.setSizeX(displayWidth, x);
-        centerY = utils.setSizeY(displayHeight, y);
+        centerX = x;
+        centerY = y;
         speedX = sx;
         speedY = sy;
         imageWidth = imgw / 2;
@@ -57,18 +60,17 @@ public class Enemy extends Object{
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, float dx, float dy) { }
 
     @Override
-    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, ArrayList ems, ArrayList emr, ArrayList emc, int hp){
+    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, int hp){
         //image = new BitmapDrawable(resizeImage(bitImage, 2.0));
         image = new BitmapDrawable(bitImage);
 
         enemyPopCount = 0;
-        enemyMoveS = ems;
-        enemyMoveR = emr;
-        enemyMoveC = emc;
         enemyMoveCount = 0;
 
-        centerX = utils.setSizeX(displayWidth, x);
-        centerY = utils.setSizeY(displayHeight, y);
+        //centerX = utils.setSizeX(displayWidth, x);
+        //centerY = utils.setSizeY(displayHeight, y);
+        centerX = x;
+        centerY = y;
         speedX = sx;
         speedY = sy;
         imageWidth = imgw;
@@ -103,14 +105,14 @@ public class Enemy extends Object{
     @Override
     public void objectMove() {
         // 上からきてレレレ
-        if(moveNum < 10) {
+        if(moveNum < moveHeight) {
             centerY += speedY;
             horizontalNum = 0;
         }else if(moveNum > 120){
             // 強化
             centerY += speedY;
             interval --;
-        }else if(horizontalNum < 26 * flag){
+        }else if(horizontalNum < moveWidth * flag){
             centerX += speedX * code;
         }else{
             horizontalNum = 0;

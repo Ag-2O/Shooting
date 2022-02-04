@@ -58,8 +58,7 @@ public abstract class Object {
     public abstract void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs);
     public abstract void objectInit(Bitmap[] bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs);
     public abstract void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, float dx, float dy);
-    public abstract void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs,
-                                    int epc, ArrayList emc, ArrayList emx, ArrayList emy, int hp);
+    public abstract void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, int hp);
 
     // 画像表示
     public abstract void objectDraw(Canvas canvas);

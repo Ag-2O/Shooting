@@ -28,8 +28,8 @@ public class Item extends Object{
         imageHeight = imgh;
         dead = false;
         bulletStatus = bs;
-        hitRange = new Rect((int) centerX - 30, (int) centerY - 30,
-                            (int) centerX + 30, (int) centerY + 30);
+        hitRange = new Rect((int) centerX - 60, (int) centerY - 60,
+                            (int) centerX + 60, (int) centerY + 60);
         objectType = 4;
     }
     @Override
@@ -38,7 +38,7 @@ public class Item extends Object{
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, float dx, float dy) {}
 
     @Override
-    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, ArrayList emc, ArrayList emx, ArrayList emy, int hp) {}
+    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, int hp) {}
 
     // 描画
     @Override
@@ -58,8 +58,8 @@ public class Item extends Object{
     @Override
     public void objectMove(){
         centerY += 10;
-        hitRange = new Rect((int)centerX - 30, (int) centerY - 30,
-                            (int)centerX + 30, (int)centerY + 30);
+        hitRange = new Rect((int)centerX - 60, (int) centerY - 60,
+                            (int)centerX + 60, (int)centerY + 60);
         if(isOutDisplayX(-imageWidth / 2)) dead = true;
         if(isOutDisplayY(-imageHeight / 2)) dead = true;
     }

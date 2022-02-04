@@ -24,8 +24,10 @@ public class Player extends Object{
     @Override
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs){
         image = new BitmapDrawable(bitImage);
-        centerX = utils.setSizeX(displayWidth,x);
-        centerY = utils.setSizeY(displayHeight,y);
+        //centerX = utils.setSizeX(displayWidth,x);
+        //centerY = utils.setSizeY(displayHeight,y);
+        centerX = x;
+        centerY = y;
         speedX = sx;
         speedY = sy;
         imageWidth = imgw;
@@ -41,7 +43,7 @@ public class Player extends Object{
     @Override
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, float dx, float dy) { }
     @Override
-    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, ArrayList emc, ArrayList emx, ArrayList emy, int hp) {}
+    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, int hp) {}
 
     // 描画
     @Override

@@ -18,10 +18,14 @@ public class Boss extends Object{
     private int horizontalNum = 0;  // 水平方向の移動のカウント
     private int code = 1;           // 符号反転
     private int flag = 1;
+    private int moveWidth, moveHeight;
+
     // コンストラクタ
     public Boss(){}
     public Boss(float dw, float dh){
         super(dw,dh);
+        moveWidth = (int)(dw / 85);
+        moveHeight = (int)(dh / 200);
     }
 
     // 初期化
@@ -34,8 +38,8 @@ public class Boss extends Object{
         enemyPopCount = 0;
         enemyMoveCount = 0;
 
-        centerX = utils.setSizeX(displayWidth, x);
-        centerY = utils.setSizeY(displayHeight, y);
+        centerX = x;
+        centerY = y;
         speedX = sx;
         speedY = sy;
         imageWidth = imgw * 2;
@@ -52,18 +56,17 @@ public class Boss extends Object{
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, float dx, float dy) { }
 
     @Override
-    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, ArrayList ems, ArrayList emr, ArrayList emc, int hp){
+    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, int hp){
         image = new BitmapDrawable(resizeImage(bitImage, 2.0));
         //image = new BitmapDrawable(bitImage);
 
         enemyPopCount = 0;
-        enemyMoveS = ems;
-        enemyMoveR = emr;
-        enemyMoveC = emc;
         enemyMoveCount = 0;
 
-        centerX = utils.setSizeX(displayWidth, x);
-        centerY = utils.setSizeY(displayHeight, y);
+        //centerX = utils.setSizeX(displayWidth, x);
+        //centerY = utils.setSizeY(displayHeight, y);
+        centerX = x;
+        centerY = y;
         speedX = sx;
         speedY = sy;
         imageWidth = imgw;

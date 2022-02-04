@@ -110,18 +110,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // ボスの体力の表示
-    public void displayHealth(int health){
+    public void displayHealth(int MAXHP){
         ProgressBar bar = (ProgressBar) findViewById(R.id.hpBar);
         bar.setVisibility(View.VISIBLE);
-        bar.setMax(10000);
-        bar.setProgress(10000 - health);
+        bar.setMax(MAXHP);
     }
 
     // ボスの体力の更新
-    public void updateHealth(int health){
+    public void updateHealth(int HP, int MAXHP){
         ProgressBar bar = (ProgressBar)findViewById(R.id.hpBar);
-        bar.setMax(10000);
-        bar.setProgress(10000 - health);
+        bar.setMax(MAXHP);
+        bar.setProgress(MAXHP - HP);
     }
 
     // タイムの表示
