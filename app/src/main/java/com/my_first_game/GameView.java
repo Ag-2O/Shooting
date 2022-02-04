@@ -221,7 +221,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
         // 描画
         while(!isGameOver && !isGameClear){
-            //Log.d("MainLoop","in while");
+            long start = System.currentTimeMillis();
             canvas = holder.lockCanvas();
             canvas.drawColor(Color.BLACK);                      // 背景黒塗り
 
@@ -269,8 +269,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 }
             });
 
-            //Log.d("MainLoop","popCount: "+ popCount);
-            Log.d("MainLoop","gameLevel: "+ level);
             if(isLiveBoss) bossBulletTime --;                           // ボスの攻撃間隔
             if(!isLiveBoss) if (bossTime == 0) popBoss();               // 1600カウント毎にボスを湧かせる
             if(!isLiveBoss){
@@ -294,8 +292,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 }
             }
 
+            long diff = System.currentTimeMillis() - start;
             try {
-                Thread.sleep(1000 / 60);
+                Thread.sleep(1000 / 30 - diff);
             } catch (Exception e){}
         }
 
