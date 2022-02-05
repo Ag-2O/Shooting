@@ -48,8 +48,24 @@ public class PlayerBullet extends Object {
     public void objectInit(Bitmap[] bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs) {}
     @Override
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, float dx, float dy) { }
+
     @Override
-    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, int hp) {}
+    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int atk, int bs, int sp){
+        image = new BitmapDrawable(resizeImage(bitImage, size));
+        centerX = x;
+        centerY = y;
+        speedX = sx;
+        speedY = sy;
+        imageWidth = (int)(imgw * size);
+        imageHeight = (int)(imgh * size);
+        dead = false;
+        bulletAngle = 0;
+        hitRange = new Rect((int)(centerX - 40 * size), (int)(centerY - 40 * size),
+                            (int)(centerX + 40 * size), (int)(centerY + 40 * size));
+        objectType = 1;
+        attack = atk;
+        bulletStatus = bs;
+    }
 
     // 描画
     @Override

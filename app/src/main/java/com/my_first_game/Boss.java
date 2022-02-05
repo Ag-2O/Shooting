@@ -85,11 +85,10 @@ public class Boss extends Object{
     public void objectDraw(Canvas canvas){
         // 生きているなら
         if(!dead){
-            //Log.d("Enemy objectDraw","centerX: ["+ centerX +"], centerY: ["+ centerY +"] ");
             image.setBounds((int)(centerX - imageWidth / 2),
-                    (int)(centerY - imageHeight / 2),
-                    (int)(centerX + imageWidth / 2),
-                    (int)(centerY + imageHeight / 2));
+                            (int)(centerY - imageHeight / 2),
+                            (int)(centerX + imageWidth / 2),
+                            (int)(centerY + imageHeight / 2));
             image.draw(canvas);
             utils.drawHitRange(hitRange, canvas);
         }

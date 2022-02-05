@@ -23,7 +23,7 @@
         android:layout_centerVertical="true"
         android:background="@null"
         android:src="@drawable/buttons_green"
-        android:onClick="modifyFireMode"/>
+        android:onClick="changeFireMode"/>
 
     <!-- スコア表示 -->
     <TextView
@@ -35,7 +35,7 @@
         android:layout_marginEnd="117dp"
         android:text="@string/scoreText"
         android:textColor="@color/white"
-        android:textSize="14pt" />
+        android:textSize="10pt" />
 
     <!-- health表示 -->
     <ProgressBar
@@ -44,6 +44,7 @@
         android:layout_height="8pt"
         android:layout_width="200pt"
         android:visibility="gone"
+        android:layout_centerHorizontal="true"
         android:progressDrawable="@drawable/progressbar"
         android:layout_below="@id/scoretext"
         android:layout_marginEnd="115dp" />

@@ -5,9 +5,7 @@ package com.my_first_game;
  */
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Random;
-import java.util.logging.Handler;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -17,33 +15,29 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import androidx.annotation.ColorRes;
-
-import com.google.android.material.slider.RangeSlider;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runnable{
     private SurfaceHolder holder;
     private Thread thread;
 
-    // どのアクティビティを使用しているか
+    // アクティビティ
     private MainActivity ma;
     private Utils us;
 
     // 画面サイズ
-    private float displayWidth = 1080;
-    private float displayHeight = 2148;
+    private float displayWidth;
+    private float displayHeight;
+
+    // 過去のタップ位置
+    private int pastEventX;
+    private int pastEventY;
 
     // 画像
     private Bitmap playerBit;           // 0:プレイヤー
@@ -67,23 +61,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     private int explosionSound;
     private int powerUpSound;
     private int getItemSound;
-    private int enterSound;
 
     // 爆発
     private Bitmap[] explosionBits = new Bitmap[4];
-    private boolean isExplosion = false;
 
     // 弾が連続して重ならないようにするフラグ
     private boolean bulletFlag;
     private int bulletTime;
     private int bossBulletTime = 5;
 
-    // アイテムのカウント
-    public int itemCount = 1;
-
-    // タップしているかどうか
-    private boolean isTap;
-
+    public int itemCount = 1;           // アイテムのカウント
+    private boolean isTap;              // タップしているかどうか
     private int gameCount;              // ゲームの時間
     public int gameScore = 0;           // ゲームスコア
     public int popTime = 200;           // 敵が湧く間隔
@@ -94,7 +82,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     public boolean isLiveBoss = false;  // ボスが生存しているかどうか
     private int playerATK = 1;          // 攻撃力
     private int level;                  // ゲームレベル
-    private int bossHP;                 // ボスの体力
     private int bossMAXHP;              // ボスの最大体力
 
     // オブジェクトを格納するリスト
@@ -117,76 +104,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         ma = (MainActivity) context;
         us = new Utils();
         init(context);
-    }
-
-    // 初期化
-    public void init(Context context){
-        // surface viewを使うために
-        holder = getHolder();
-        holder.addCallback(this);
-        thread = new Thread(this);
-        displayWidth = ma.gvWidth;
-        displayHeight = ma.gvHeight;
-        holder.setFixedSize((int)displayWidth, (int)displayHeight);
-
-        // 画像読み込み
-        Resources resources = context.getResources();
-        playerBit = BitmapFactory.decodeResource(resources, R.drawable.player);
-        bulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_green);
-        pinkBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_pink);
-        yellowBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_yellow);
-        specialBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_green);
-
-        enemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_default);
-        greenEnemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_green);
-        pinkEnemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_pink);
-        yellowEnemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_yellow);
-
-        itemBit = BitmapFactory.decodeResource(resources, R.drawable.items_energy);
-        enemyBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_enemy);
-        trackingBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_default);
-        bossBit = BitmapFactory.decodeResource(resources, R.drawable.boss);
-
-        //TODO: 爆発のアニメーションを作れ
-        for(int i = 0; i < 4; i++){
-            if(i == 0) explosionBits[i] = BitmapFactory.decodeResource(resources, R.drawable.explosion);
-            if(i == 1) explosionBits[i] = BitmapFactory.decodeResource(resources, R.drawable.explosion);
-            if(i == 2) explosionBits[i] = BitmapFactory.decodeResource(resources, R.drawable.explosion);
-            if(i == 3) explosionBits[i] = BitmapFactory.decodeResource(resources, R.drawable.explosion);
-        }
-
-        // 音声読み込み
-        AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_GAME)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                .build();
-
-        soundPool = new SoundPool.Builder()
-                .setAudioAttributes(audioAttributes)
-                .setMaxStreams(4)
-                .build();
-
-        playerFireSound = soundPool.load(context, R.raw.shotplayer, 1);
-        enemyFireSound = soundPool.load(context, R.raw.shotenemy, 1);
-        explosionSound = soundPool.load(context, R.raw.explosion, 1);
-        powerUpSound = soundPool.load(context, R.raw.powerup, 1);
-        getItemSound = soundPool.load(context, R.raw.getitem, 1);
-        enterSound = soundPool.load(context, R.raw.enter, 1);
-
-        // プレイヤーオブジェクトの生成
-        object.add(new Player(displayWidth,displayHeight));
-        object.get(0).objectInit(playerBit,displayWidth / 2,displayHeight / 2,0,0,
-                playerBit.getWidth(),playerBit.getHeight(),0);
-
-        // 弾の制御
-        bulletFlag = true;
-        bulletTime = 8;
-
-        // タップ状態
-        isTap = false;
-
-        // ゲーム時間の初期化
-        gameCount = 0;
     }
 
     // SurfaceViewが作られる時に実行される
@@ -213,48 +130,128 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         }
     }
 
-    // メインループ
+    /*
+    ##########################################################################
+                                  ゲームの初期化
+    ##########################################################################
+     */
+
+    // 初期化
+    public void init(Context context){
+        // surface viewを使うために
+        holder = getHolder();
+        holder.addCallback(this);
+        thread = new Thread(this);
+        displayWidth = ma.gvWidth;
+        displayHeight = ma.gvHeight;
+        holder.setFixedSize((int)displayWidth, (int)displayHeight);
+
+        loadImage(context);     // 画像の読み込み
+        loadSound(context);     // 音声の読み込み
+        generatePlayer();       // プレイヤーオブジェクトの生成
+
+        bulletFlag = true;      // 射撃フラグ
+        bulletTime = 40;        // 射撃間隔
+        isTap = false;          // タップ状態
+        pastEventX = (int)(displayWidth / 2);   // タップの初期位置
+        pastEventY = (int)(displayHeight / 2);  // タップの初期位置
+        gameCount = 0;          // ゲーム時間の初期化
+    }
+
+    // 画像読み込み
+    public void loadImage(Context context){
+        Resources resources = context.getResources();
+        playerBit = BitmapFactory.decodeResource(resources, R.drawable.player);
+        bulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_green);
+        pinkBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_pink);
+        yellowBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_yellow);
+        specialBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_green);
+
+        enemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_default);
+        greenEnemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_green);
+        pinkEnemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_pink);
+        yellowEnemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_yellow);
+
+        itemBit = BitmapFactory.decodeResource(resources, R.drawable.items_energy);
+        enemyBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_enemy);
+        trackingBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_default);
+        bossBit = BitmapFactory.decodeResource(resources, R.drawable.boss);
+
+        //TODO: 爆発のアニメーションを作れ
+        for(int i = 0; i < 4; i++){
+            if(i == 0) explosionBits[i] = BitmapFactory.decodeResource(resources, R.drawable.explosion);
+            if(i == 1) explosionBits[i] = BitmapFactory.decodeResource(resources, R.drawable.explosion);
+            if(i == 2) explosionBits[i] = BitmapFactory.decodeResource(resources, R.drawable.explosion);
+            if(i == 3) explosionBits[i] = BitmapFactory.decodeResource(resources, R.drawable.explosion);
+        }
+    }
+
+    // 音声読み込み
+    public void loadSound(Context context){
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build();
+
+        soundPool = new SoundPool.Builder()
+                .setAudioAttributes(audioAttributes)
+                .setMaxStreams(4)
+                .build();
+
+        playerFireSound = soundPool.load(context, R.raw.shotplayer, 1);
+        enemyFireSound = soundPool.load(context, R.raw.shotenemy, 1);
+        explosionSound = soundPool.load(context, R.raw.explosion, 1);
+        powerUpSound = soundPool.load(context, R.raw.powerup, 1);
+        getItemSound = soundPool.load(context, R.raw.getitem, 1);
+    }
+
+    // プレイヤーオブジェクトの生成
+    public void generatePlayer(){
+        object.add(new Player(displayWidth, displayHeight));
+        object.get(0).objectInit(playerBit, displayWidth / 2, displayHeight / 2, 0, 0,
+                playerBit.getWidth(), playerBit.getHeight(), 0);
+    }
+
+
+    /*
+    ##########################################################################
+                                   メインループ
+    ##########################################################################
+     */
+
+    //TODO: 斬撃系モーションの追加(半月のイメージ)
+    //TODO: 被弾時のエフェクトのついか　
+    //TODO: プレイヤーに体力を追加
+    //TODO: まれに回復アイテムを落とすようにする
+    //TODO: ゲームレベルの表示
+
     public void run(){
-        Canvas canvas;
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
+        Canvas canvas;              // 描画するためのキャンパス
+        Paint paint = new Paint();  // ペイント
+        paint.setAntiAlias(true);   // アンチエイリアスの機能のon/off
 
         // 描画
         while(!isGameOver && !isGameClear){
-            long start = System.currentTimeMillis();
-            canvas = holder.lockCanvas();
-            canvas.drawColor(Color.BLACK);                      // 背景黒塗り
-
-            // プレイヤーの処理
-            object.get(0).bulletStatus = ma.getFireMode();      // 射撃モードの更新
-            object.get(0).isSpecial = ma.getIsSpecial();
-            if(object.get(0).isSpecial) fireSpecialBullet();    // 必殺
-            if(isTap) fireBullet();                             // タップ中なら射撃
+            long start = System.currentTimeMillis();    // 時間計測スタート
+            canvas = holder.lockCanvas();               // キャンバスに塗れるように
+            canvas.drawColor(Color.BLACK);              // 背景黒塗り
 
             // オブジェクトの処理
             for(int i = 0; i < object.size(); i++){
+                // プレイヤーの処理
+                if(i == 0) processPlayerObject();
+
                 // 雑魚敵の攻撃処理
-                if(i != 0 && object.get(i).isFireBullet){
-                    object.get(i).isFireBullet = false;
-                    enemyFireBullet(i);                         // 敵の射撃
-                }
+                if(i != 0 && object.get(i).isFireBullet) processEnemyObject(i);
 
                 // ボスの攻撃処理
-                if(gameCount > bossTime){
-                    if(i != 0 && object.get(i).objectType == 6 && bossBulletTime < 1) {
-                        //TODO: Healthによって特殊技が合ってもいいかも
-                        ma.updateHealth(object.get(i).health, bossMAXHP);  // 体力の描画
-                        bossSpecialFire(i,object.get(i).health);  // 体力に応じた攻撃
-                        bossBulletTime = 40;
-                    }
-                }
+                if(gameCount > bossTime) processBossObject(i);
 
-                object.get(i).objectDraw(canvas);               // 描画
-                object.get(i).objectMove();                     // 移動
-                judgeHit(object,i);                             // 当たり判定
-                drawExplosion(i);                               // 爆発の描画
-                drawItem(i);                                    // アイテムの描画
-                if(object.get(i).isDead()) object.remove(i);    // 範囲外なら弾を消去
+                // 描画
+                object.get(i).objectDraw(canvas);
+
+                // オブジェクトの更新
+                updateObject(i);
 
             }
 
@@ -262,26 +259,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             ma.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ma.updateScore(gameScore);                  // スコア更新
-                    ma.updateTime(gameCount);                   // ゲーム時間更新
-                    ma.updateItemCounts(itemCount);             // アイテムカウントの更新
-                    ma.updateAttack(playerATK);                 // 攻撃力の更新
+                    ma.updateScore(gameScore);          // スコア更新
+                    ma.updateTime(gameCount);           // ゲーム時間更新
+                    ma.updateItemCounts(itemCount);     // アイテムカウントの更新
+                    ma.updateAttack(playerATK);         // 攻撃力の更新
                 }
             });
 
-            if(isLiveBoss) bossBulletTime --;                           // ボスの攻撃間隔
-            if(!isLiveBoss) if (bossTime == 0) popBoss();               // 1600カウント毎にボスを湧かせる
-            if(!isLiveBoss){
-                if(gameCount % popTime == 0) popCount = 5 + level / 2;  // popTime毎に湧き数をリセット
-                if(popCount > 0 && gameCount % 5 == 0) popEnemies();    // 敵を湧かせる
-                bossTime --;
-            }
+            // 敵の制御
+            controlEnemies();
 
-            controlFire();                                      // 弾を連続で撃てないように
-            ++ gameCount;                                       // ゲーム時間を進める
-            level = (gameCount / 500) + 1;                      // ゲームのレベルアップ
-            holder.unlockCanvasAndPost(canvas);
-            if(isGameOver || isGameClear) break;                // ゲームオーバーならループを抜ける
+            // 弾を連続で撃てないように
+            controlFire();
+
+            ++ gameCount;                               // ゲーム時間を進める
+            level = (gameCount / 500) + 1;              // ゲームのレベルアップ
+            holder.unlockCanvasAndPost(canvas);         // キャンバス
+
+            if(isGameOver || isGameClear) break;        // ゲームオーバーならループを抜ける
 
             // ポーズ
             if(ma.getIsPose()){
@@ -292,12 +287,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 }
             }
 
+            // FPS調整
             long diff = System.currentTimeMillis() - start;
             try {
                 Thread.sleep(1000 / 30 - diff);
             } catch (Exception e){}
         }
 
+        // ゲーム終了
         ma.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -310,20 +307,85 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         });
     }
 
-    // タップした時の処理
+    // プレイヤーの処理
+    public void processPlayerObject(){
+        object.get(0).bulletStatus = ma.getFireMode();          // 射撃モードの更新
+        object.get(0).isSpecial = ma.getIsSpecial();            // 必殺技ボタンが押されたかどうか
+        if(object.get(0).isSpecial) fireSpecialBullet();        // 必殺技を撃つ
+        if(isTap) fireBullet();                                 // タップ中なら射撃
+    }
+
+    // 敵の処理
+    public void processEnemyObject(int i){
+        object.get(i).isFireBullet = false;                     // 射撃するかどうか
+        enemyFireBullet(i);                                     // 敵の射撃
+    }
+
+    // ボスの処理
+    public void processBossObject(int i){
+        if(i != 0 && object.get(i).objectType == 6 && bossBulletTime < 1) {
+            //TODO: Healthによって特殊技が合ってもいいかも
+            ma.updateHealth(object.get(i).health, bossMAXHP);   // 体力の描画
+            bossFireSpecial(i,object.get(i).health);            // 体力に応じた攻撃
+            bossBulletTime = 40;                                // ボスの攻撃間隔
+        }
+    }
+
+    // オブジェクトの更新
+    public void updateObject(int i){
+        object.get(i).objectMove();                     // 移動
+        judgeHit(object,i);                             // 当たり判定
+        generateExplosion(i);                           // 爆発の描画
+        generateItem(i);                                // アイテムの描画
+        if(object.get(i).isDead()) object.remove(i);    // 範囲外なら弾を消去
+    }
+
+    // 敵の制御
+    public void controlEnemies(){
+        if(isLiveBoss) bossBulletTime --;                           // ボスの攻撃間隔
+        if(!isLiveBoss && bossTime == 0) popBoss();                 // 1600カウント毎にボスを湧かせる
+        if(!isLiveBoss){
+            if(gameCount % popTime == 0) popCount = 5 + level / 2;  // popTime毎に湧き数をリセット
+            if(popCount > 0 && gameCount % 5 == 0 && gameCount != 0) popEnemies();  // 5step毎敵を湧かせる
+            bossTime --;
+        }
+    }
+
+    // 射撃間隔の制御
+    public void controlFire(){
+        if(!bulletFlag){
+            -- bulletTime;
+            if(bulletTime < 0){
+                bulletTime = 8;
+                bulletFlag = true;
+            }
+        }
+    }
+
+
+    /*
+    ##########################################################################
+                               タップした時の処理
+    ##########################################################################
+     */
+
     @Override
     public boolean onTouchEvent(MotionEvent event){
-        int action = event.getAction();
-        int eventX = (int) event.getX();
-        int eventY = (int) event.getY();
-        //Log.d("MainLoop","Touch Position: x["+eventX+"], y["+eventY+" ");
+        //TODO: タップの操作性の改良
+        int action = event.getAction();         // アクションタイプ
+        // 現在のタップ位置
+        int currentEventX = (int) event.getX();
+        int currentEventY = (int) event.getY();
+
+        // タップ位置の差
+        int differenceEventX = pastEventX - currentEventX;
+        int differenceEventY = pastEventY - currentEventY;
 
         // 各処理
         switch(action){
             case MotionEvent.ACTION_DOWN:
                 // 自機付近をタップした時に弾を生成
-                //Log.d("MainLoop","in bullet generate");
-                isTap = true;           // タップ
+                isTap = true;
                 bulletFlag = false;
                 break;
 
@@ -333,14 +395,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
             case MotionEvent.ACTION_MOVE:
                 // 自機の移動
-                //Log.d("MainLoop","in player move");
-                if(us.isRectOverlap(eventX,eventY, object.get(0).objectGetTapRect())){
-                    object.get(0).objectMove(eventX,eventY);
-                }
+                if(Math.abs(differenceEventX) < 100 && Math.abs(differenceEventY) < 100)
+                    object.get(0).objectMove(pastEventX - currentEventX,pastEventY - currentEventY);
+
+                // タップした位置を保存
+                pastEventX = currentEventX;
+                pastEventY = currentEventY;
                 break;
         }
         return true;
     }
+
+
+    /*
+    ##########################################################################
+                                  敵の湧き制御
+    ##########################################################################
+     */
 
     // 敵のポップ
     public void popEnemies(){
@@ -398,19 +469,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         });
     }
 
-    // 射撃間隔の制御
-    public void controlFire(){
-        if(!bulletFlag){
-            -- bulletTime;
-            if(bulletTime < 0){
-                bulletTime = 8;
-                bulletFlag = true;
-            }
-        }
-    }
-
     // 敵に弾が当たったら爆発オブジェクト生成
-    public void drawExplosion(int i){
+    public void generateExplosion(int i){
         if(object.get(i).isExplosion) {
             object.add(new Explosion(displayWidth, displayHeight));
             object.get(object.size() - 1).
@@ -423,7 +483,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     }
 
     // 爆発アニメーション後、アイテムオブジェクトを生成
-    public void drawItem(int i){
+    public void generateItem(int i){
         if(i != 0 && object.get(i).objectType == 3){
             if(object.get(i).dead){
                 object.add(new Item(displayWidth, displayHeight));
@@ -435,58 +495,36 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         }
     }
 
+
+    /*
+    ##########################################################################
+                                  　 射撃処理
+    ##########################################################################
+     */
+
     // 弾を撃つ
     public void fireBullet(){
-        // 緑
-        if(object.get(0).bulletStatus == 0){
-            object.add(new PlayerBullet(displayWidth, displayHeight));
-            object.get(object.size() - 1).objectInit(bulletBit, object.get(0).centerX - 40,
-                    object.get(0).centerY - playerBit.getHeight(),
-                    0, 75, bulletBit.getWidth(),
-                    bulletBit.getHeight(), playerATK);
-            object.get(object.size() - 1).bulletStatus = 0;
+        int bs = object.get(0).bulletStatus;    // 弾の属性の取得
+        Bitmap bulletType;                      // 属性別の画像を取得
 
-            object.add(new PlayerBullet(displayWidth, displayHeight));
-            object.get(object.size() - 1).objectInit(bulletBit, object.get(0).centerX + 40,
-                    object.get(0).centerY - playerBit.getHeight(),
-                    0, 75, bulletBit.getWidth(),
-                    bulletBit.getHeight(), playerATK);
-            object.get(object.size() - 1).bulletStatus = 0;
-        }
+        if(bs == 0){bulletType = bulletBit;}
+        else if(bs == 1){bulletType = pinkBulletBit;}
+        else {bulletType = yellowBulletBit;}
 
-        // 赤
-        if(object.get(0).bulletStatus == 1){
-            object.add(new PlayerBullet(displayWidth, displayHeight));
-            object.get(object.size() - 1).objectInit(pinkBulletBit, object.get(0).centerX - 40,
-                    object.get(0).centerY - playerBit.getHeight(),
-                    0, 75, pinkBulletBit.getWidth(),
-                    pinkBulletBit.getHeight(), playerATK);
-            object.get(object.size() - 1).bulletStatus = 1;
+        // 2連射撃
+        object.add(new PlayerBullet(displayWidth, displayHeight));
+        object.get(object.size() - 1).objectInit(bulletType, object.get(0).centerX - 40,
+                object.get(0).centerY - playerBit.getHeight(),
+                0, 75, bulletType.getWidth(),
+                bulletType.getHeight(), playerATK, bs, 0);
 
-            object.add(new PlayerBullet(displayWidth, displayHeight));
-            object.get(object.size() - 1).objectInit(pinkBulletBit, object.get(0).centerX + 40,
-                    object.get(0).centerY - playerBit.getHeight(),
-                    0, 75, pinkBulletBit.getWidth(),
-                    pinkBulletBit.getHeight(), playerATK);
-            object.get(object.size() - 1).bulletStatus = 1;
-        }
+        object.add(new PlayerBullet(displayWidth, displayHeight));
+        object.get(object.size() - 1).objectInit(bulletType, object.get(0).centerX + 40,
+                object.get(0).centerY - playerBit.getHeight(),
+                0, 75, bulletType.getWidth(),
+                bulletType.getHeight(), playerATK, bs, 0);
 
-        // 黄色
-        if(object.get(0).bulletStatus == 2){
-            object.add(new PlayerBullet(displayWidth, displayHeight));
-            object.get(object.size() - 1).objectInit(yellowBulletBit, object.get(0).centerX - 40,
-                    object.get(0).centerY - playerBit.getHeight(),
-                    0, 75, yellowBulletBit.getWidth(),
-                    yellowBulletBit.getHeight(), playerATK);
-            object.get(object.size() - 1).bulletStatus = 2;
-
-            object.add(new PlayerBullet(displayWidth, displayHeight));
-            object.get(object.size() - 1).objectInit(yellowBulletBit, object.get(0).centerX + 40,
-                    object.get(0).centerY - playerBit.getHeight(),
-                    0, 75, yellowBulletBit.getWidth(),
-                    yellowBulletBit.getHeight(), playerATK);
-            object.get(object.size() - 1).bulletStatus = 2;
-        }
+        // 射撃音
         soundPool.play(playerFireSound, 1.0f, 1.0f, 0,0,1);
     }
 
@@ -614,7 +652,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         soundPool.play(enemyFireSound, 1.0f, 1.0f, 0,0,1);
     }
 
-    public void bossSpecialFire(int i, int health){
+    // ボスの特殊攻撃
+    public void bossFireSpecial(int i, int health){
         //TODO: 体力に応じた特殊攻撃の実装
 
         // 体力が減ると攻撃速度が上がる
@@ -629,8 +668,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         } else{
             bossFireBullet(i,0);
         }
-
     }
+
+    /*
+    ##########################################################################
+                              　    被弾処理
+    ##########################################################################
+    */
 
     //　被弾の処理
     public void judgeHit(ArrayList<Object> object, int i){
@@ -664,20 +708,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             if(i != j && object.get(i).objectType == 1 && object.get(j).objectType == 6) {
                 // 被弾したらオブジェクトを削除
                 if (isHitRange(object.get(i).hitRange, object.get(j).hitRange)) {
-                    // 弾の削除
-                    object.get(i).dead = true;
+                    object.get(i).dead = true;              // 弾の削除
 
                     // 一定回数被弾したら撃破
                     if(object.get(j).health < 0) {
                         gameScore += 4000;
-                        object.get(j).isExplosion = true;
-                        object.get(j).dead = true;
-                        isLiveBoss = false;
-                        bossTime = 1600;
+                        object.get(j).isExplosion = true;   // 爆発
+                        object.get(j).dead = true;          // 死亡
+                        isLiveBoss = false;                 // ボス生存フラグ
+                        bossTime = 1600;                    // ボス復活までの時間
+                        ma.hideHealth();                    // ボスのHPバーの削除
                     }else{
                         gameScore += 10;
                         object.get(j).health -= object.get(i).attack;
-                        bossBulletTime --;  // 攻撃するほど敵の弾が増えるように
                     }
                 }
             }

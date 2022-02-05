@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 射撃モード変更
-    public void modifyFireMode(View view){
+    public void changeFireMode(View view){
         ImageButton imageButton = (ImageButton) findViewById(R.id.imagebutton);
         soundPool.play(modeChangeSound, 1.0f, 1.0f, 1, 0, 1);
         if(fireMode == 0){
@@ -121,6 +121,12 @@ public class MainActivity extends AppCompatActivity {
         ProgressBar bar = (ProgressBar)findViewById(R.id.hpBar);
         bar.setMax(MAXHP);
         bar.setProgress(MAXHP - HP);
+    }
+
+    // ボスの体力の非表示
+    public void hideHealth(){
+        ProgressBar bar = (ProgressBar) findViewById(R.id.hpBar);
+        bar.setVisibility(View.GONE);
     }
 
     // タイムの表示

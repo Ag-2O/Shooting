@@ -62,17 +62,19 @@ public class Player extends Object{
     @Override
     public void objectMove(){}
     @Override
-    public void objectMove(int x, int y){
+    public void objectMove(int diffX, int diffY){
         float centerXX = centerX;
         float centerYY = centerY;
-        centerX = x;
-        centerY = y;
+        centerX = centerX - diffX;
+        centerY = centerY - diffY;
+
+        // 画面外なら移動しない
+        if(isOutDisplayX(imageWidth / 2)) centerX = centerXX;
+        if(isOutDisplayY(imageHeight / 2)) centerY = centerYY;
 
         hitRange = new Rect((int) centerX - 30, (int) centerY - 30,
                             (int) centerX + 30, (int) centerY + 30);
 
-        if(isOutDisplayX(imageWidth / 2)) centerX = centerXX;
-        if(isOutDisplayY(imageHeight / 2)) centerY = centerYY;
     }
 
     // 範囲を広げてタップした時に移動できるように
