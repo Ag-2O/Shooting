@@ -25,15 +25,47 @@
         android:src="@drawable/buttons_green"
         android:onClick="changeFireMode"/>
 
+    <!-- 必殺ボタン -->
+    <ImageButton
+        android:id="@+id/specialbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imagebutton"
+        android:layout_marginBottom="2dp"
+        android:background="@null"
+        android:src="@drawable/buttons_specialno"
+        android:onClick="touchSpecialButton"/>
+
+    <!-- 斬撃ボタン -->
+    <ImageButton
+        android:id="@+id/slashingbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/specialbutton"
+        android:layout_centerVertical="true"
+        android:background="@null"
+        android:src="@drawable/buttons_slashingno"
+        android:onClick="touchSlashingButton"/>
+
+    <!-- 設定ボタン -->
+    <ImageButton
+        android:id="@+id/settingimagebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/timetext"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:onClick="touchSetting"
+        android:background="@null"
+        android:src="@drawable/set" />
+
     <!-- スコア表示 -->
     <TextView
         android:id="@+id/scoretext"
-        android:layout_width="200pt"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="117dp"
-        android:text="@string/scoreText"
+        android:text=" SCORE: 0"
         android:textColor="@color/white"
         android:textSize="10pt" />
 
@@ -52,30 +84,19 @@
     <!-- タイム表示 -->
     <TextView
         android:id="@+id/timetext"
-        android:layout_width="200pt"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:text="@string/timeText"
+        android:text=" TIME: 0"
         android:textColor="@color/white"
         android:textSize="10pt" />
-
-    <!-- 必殺ボタン -->
-    <ImageButton
-        android:id="@+id/specialbutton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/imagebutton"
-        android:layout_marginBottom="2dp"
-        android:background="@null"
-        android:src="@drawable/buttons_specialno"
-        android:onClick="touchSpecialButton"/>
 
     <!-- 攻撃力表示 -->
     <TextView
         android:id="@+id/atktext"
-        android:layout_width="50pt"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/imagebutton"
         android:layout_marginBottom="2dp"
@@ -86,7 +107,7 @@
     <!-- アイテム表示 -->
     <TextView
         android:id="@+id/itemtext"
-        android:layout_width="50pt"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/atktext"
         android:layout_marginBottom="2dp"
@@ -94,20 +115,16 @@
         android:textColor="@color/white"
         android:textSize="10pt" />
 
-    <!-- 設定ボタン -->
-    <ImageButton
-        android:id="@+id/settingimagebutton"
+    <!-- ゲームレベル表示 -->
+    <TextView
+        android:id="@+id/leveltext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/timetext"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="316dp"
-        android:layout_marginEnd="3dp"
-        android:layout_marginBottom="4dp"
-        android:onClick="touchSetting"
-        android:background="@null"
-        android:src="@drawable/set" />
+        android:layout_above="@id/itemtext"
+        android:layout_marginBottom="2dp"
+        android:text=" Level: 1"
+        android:textColor="@color/white"
+        android:textSize="10pt" />
 
     <!-- POSE -->
     <TextView

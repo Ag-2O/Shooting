@@ -53,6 +53,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     private Bitmap trackingBulletBit;   // 5:敵の弾
     private Bitmap bossBit;             // 6:ボス
     private Bitmap specialBulletBit;    // 7:ULT
+    private Bitmap slashingBit;         // 8:斬撃
 
     // 効果音
     private SoundPool soundPool;
@@ -61,6 +62,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     private int explosionSound;
     private int powerUpSound;
     private int getItemSound;
+    private int slashingSound;
 
     // 爆発
     private Bitmap[] explosionBits = new Bitmap[4];
@@ -70,17 +72,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     private int bulletTime;
     private int bossBulletTime = 5;
 
-    public int itemCount = 1;           // アイテムのカウント
+    public int itemCount;               // アイテムのカウント
     private boolean isTap;              // タップしているかどうか
     private int gameCount;              // ゲームの時間
-    public int gameScore = 0;           // ゲームスコア
-    public int popTime = 200;           // 敵が湧く間隔
-    public int popCount = 7;            // 敵が湧く量
-    public boolean isGameOver = false;  // ゲームオーバーかどうか
-    public boolean isGameClear = false; // ゲームクリアかどうか
-    public int bossTime = 1600;         // ボスが出現する時間
-    public boolean isLiveBoss = false;  // ボスが生存しているかどうか
-    private int playerATK = 1;          // 攻撃力
+    public int gameScore;               // ゲームスコア
+    public int popTime;                 // 敵が湧く間隔
+    public int popCount;                // 敵が湧く量
+    public boolean isGameOver;          // ゲームオーバーかどうか
+    public boolean isGameClear;         // ゲームクリアかどうか
+    public int bossTime;                // ボスが出現する時間
+    public boolean isLiveBoss;          // ボスが生存しているかどうか
+    private int playerATK;              // 攻撃力
     private int level;                  // ゲームレベル
     private int bossMAXHP;              // ボスの最大体力
 
@@ -149,13 +151,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         loadImage(context);     // 画像の読み込み
         loadSound(context);     // 音声の読み込み
         generatePlayer();       // プレイヤーオブジェクトの生成
+        setGameSetting();       // ゲームの初期設定
 
-        bulletFlag = true;      // 射撃フラグ
-        bulletTime = 40;        // 射撃間隔
-        isTap = false;          // タップ状態
-        pastEventX = (int)(displayWidth / 2);   // タップの初期位置
-        pastEventY = (int)(displayHeight / 2);  // タップの初期位置
-        gameCount = 0;          // ゲーム時間の初期化
     }
 
     // 画像読み込み
@@ -166,6 +163,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         pinkBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_pink);
         yellowBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_yellow);
         specialBulletBit = BitmapFactory.decodeResource(resources, R.drawable.bullets_green);
+        slashingBit = BitmapFactory.decodeResource(resources, R.drawable.slashing);
 
         enemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_default);
         greenEnemyBit = BitmapFactory.decodeResource(resources, R.drawable.enemies_green);
@@ -203,6 +201,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         explosionSound = soundPool.load(context, R.raw.explosion, 1);
         powerUpSound = soundPool.load(context, R.raw.powerup, 1);
         getItemSound = soundPool.load(context, R.raw.getitem, 1);
+        slashingSound = soundPool.load(context, R.raw.slashing, 1);
     }
 
     // プレイヤーオブジェクトの生成
@@ -212,6 +211,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 playerBit.getWidth(), playerBit.getHeight(), 0);
     }
 
+    //ゲームの初期設定
+    public void setGameSetting(){
+        itemCount = 1;                          // アイテムのカウント
+        isTap = false;                          // タップしているかどうか
+        gameCount = 0;                          // ゲームの時間
+        gameScore = 0;                          // ゲームスコア
+        popTime = 200;                          // 敵が湧く間隔
+        popCount = 7;                           // 敵が湧く量
+        isGameOver = false;                     // ゲームオーバーかどうか
+        isGameClear = false;                    // ゲームクリアかどうか
+        bossTime = 1600;                        // ボスが出現する時間
+        isLiveBoss = false;                     // ボスが生存しているかどうか
+        playerATK = 1;                          // 攻撃力
+        level = 1;                              // ゲームレベル
+        bossMAXHP = 3000;                       // ボスの最大体力
+        bulletFlag = true;                      // 射撃フラグ
+        bulletTime = 40;                        // 射撃間隔
+        isTap = false;                          // タップ状態
+        pastEventX = (int)(displayWidth / 2);   // タップの初期位置
+        pastEventY = (int)(displayHeight / 2);  // タップの初期位置
+        gameCount = 0;                          // ゲーム時間の初期化
+    }
 
     /*
     ##########################################################################
@@ -219,11 +240,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     ##########################################################################
      */
 
-    //TODO: 斬撃系モーションの追加(半月のイメージ)
-    //TODO: 被弾時のエフェクトのついか　
-    //TODO: プレイヤーに体力を追加
-    //TODO: まれに回復アイテムを落とすようにする
     //TODO: ゲームレベルの表示
+    //TODO: チュートリアルの追加
 
     public void run(){
         Canvas canvas;              // 描画するためのキャンパス
@@ -245,7 +263,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 if(i != 0 && object.get(i).isFireBullet) processEnemyObject(i);
 
                 // ボスの攻撃処理
-                if(gameCount > bossTime) processBossObject(i);
+                //TODO: Healthによって特殊技が合ってもいいかも
+                if(gameCount > bossTime)
+                    if(i != 0 && object.get(i).objectType == 6 && bossBulletTime < 1)
+                        processBossObject(i);
 
                 // 描画
                 object.get(i).objectDraw(canvas);
@@ -255,16 +276,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
             }
 
-            // メインスレッドでの処理
-            ma.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ma.updateScore(gameScore);          // スコア更新
-                    ma.updateTime(gameCount);           // ゲーム時間更新
-                    ma.updateItemCounts(itemCount);     // アイテムカウントの更新
-                    ma.updateAttack(playerATK);         // 攻撃力の更新
-                }
-            });
+            // 画面上のテキストの更新処理
+            updateDisplayText();
 
             // 敵の制御
             controlEnemies();
@@ -272,11 +285,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
             // 弾を連続で撃てないように
             controlFire();
 
-            ++ gameCount;                               // ゲーム時間を進める
-            level = (gameCount / 500) + 1;              // ゲームのレベルアップ
             holder.unlockCanvasAndPost(canvas);         // キャンバス
 
             if(isGameOver || isGameClear) break;        // ゲームオーバーならループを抜ける
+
+            // FPS調整
+            long diff = System.currentTimeMillis() - start;
+            try {
+                Thread.sleep(1000 / 30 - diff);
+            } catch (Exception e){}
 
             // ポーズ
             if(ma.getIsPose()){
@@ -287,11 +304,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 }
             }
 
-            // FPS調整
-            long diff = System.currentTimeMillis() - start;
-            try {
-                Thread.sleep(1000 / 30 - diff);
-            } catch (Exception e){}
+            // ステップを進める
+            ++ gameCount;                               // ゲーム時間を進める
+            level = (gameCount / 400) + 1;              // ゲームのレベルアップ
         }
 
         // ゲーム終了
@@ -310,8 +325,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     // プレイヤーの処理
     public void processPlayerObject(){
         object.get(0).bulletStatus = ma.getFireMode();          // 射撃モードの更新
-        object.get(0).isSpecial = ma.getIsSpecial();            // 必殺技ボタンが押されたかどうか
-        if(object.get(0).isSpecial) fireSpecialBullet();        // 必殺技を撃つ
+        if(ma.getIsSpecial()) fireSpecialBullet();              // 必殺技を撃つ
+        if(ma.getIsSlashing()) fireSlashing();                  // 斬撃を撃つ
         if(isTap) fireBullet();                                 // タップ中なら射撃
     }
 
@@ -323,12 +338,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
     // ボスの処理
     public void processBossObject(int i){
-        if(i != 0 && object.get(i).objectType == 6 && bossBulletTime < 1) {
-            //TODO: Healthによって特殊技が合ってもいいかも
-            ma.updateHealth(object.get(i).health, bossMAXHP);   // 体力の描画
-            bossFireSpecial(i,object.get(i).health);            // 体力に応じた攻撃
-            bossBulletTime = 40;                                // ボスの攻撃間隔
-        }
+        ma.updateHealth(object.get(i).health, bossMAXHP);   // 体力の描画
+        bossFireSpecial(i,object.get(i).health);            // 体力に応じた攻撃
+        bossBulletTime = 40;                                // ボスの攻撃間隔
     }
 
     // オブジェクトの更新
@@ -343,10 +355,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     // 敵の制御
     public void controlEnemies(){
         if(isLiveBoss) bossBulletTime --;                           // ボスの攻撃間隔
-        if(!isLiveBoss && bossTime == 0) popBoss();                 // 1600カウント毎にボスを湧かせる
+        if(!isLiveBoss && bossTime == 0) generateBoss();            // 1600カウント毎にボスを湧かせる
         if(!isLiveBoss){
             if(gameCount % popTime == 0) popCount = 5 + level / 2;  // popTime毎に湧き数をリセット
-            if(popCount > 0 && gameCount % 5 == 0 && gameCount != 0) popEnemies();  // 5step毎敵を湧かせる
+            if(popCount > 0 && gameCount % 5 == 0 && gameCount != 0) generateEnemies();  // 5step毎敵を湧かせる
             bossTime --;
         }
     }
@@ -360,6 +372,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                 bulletFlag = true;
             }
         }
+    }
+
+    // 画面上のテキストの更新処理
+    public void updateDisplayText(){
+        // メインスレッドでの処理
+        ma.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ma.updateScore(gameScore);          // スコア更新
+                ma.updateTime(gameCount);           // ゲーム時間更新
+                ma.updateItemCounts(itemCount);     // アイテムカウントの更新
+                ma.updateAttack(playerATK);         // 攻撃力の更新
+                ma.updateLevel(level);              // ゲームレベルの更新
+                if(!isLiveBoss) ma.hideHealth();    // ボスのHPバーの削除
+            }
+        });
     }
 
 
@@ -409,50 +437,59 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
     /*
     ##########################################################################
-                                  敵の湧き制御
+                                  オブジェクトの生成
     ##########################################################################
      */
 
-    // 敵のポップ
-    public void popEnemies(){
-        // カウントが進むにつれ難易度が増す
-        int rand = random.nextInt((level % 4) + 1);
+    // 敵の生成
+    public void generateEnemies(){
+        int range;
+        int pos = (int)displayWidth / 2;
 
-        if(rand == 1){
+        // 乱数の範囲をカウントで決める
+        if(gameCount < 1000) range = 1;
+        else if(gameCount < 2000) range = 2;
+        else range = 3;
+
+        int randPos = random.nextInt(range);       // 湧きの種類を決める
+        int randType = random.nextInt(4);   // 湧く敵の種類を決める
+
+        if(randPos != 0) pos = random.nextInt((int)displayWidth); // x座標をランダムに
+
+        if(randType == 1){
             // green
             object.add(new Enemy(displayWidth, displayHeight));
             object.get(object.size() - 1)
-                    .objectInit(greenEnemyBit, displayWidth / 2, -60, 20, 20,
-                            greenEnemyBit.getWidth(), greenEnemyBit.getHeight(), 1, 0,
+                    .objectInit(greenEnemyBit, pos, -60, 20, 20,
+                            greenEnemyBit.getWidth(), greenEnemyBit.getHeight(), 1, randPos,
                             15*level);
-        }else if(rand == 2){
+        }else if(randType == 2){
             // pink
             object.add(new Enemy(displayWidth, displayHeight));
             object.get(object.size() - 1)
-                    .objectInit(pinkEnemyBit, displayWidth / 2, -60, 20, 20,
-                            pinkEnemyBit.getWidth(), pinkEnemyBit.getHeight(), 2, 0,
+                    .objectInit(pinkEnemyBit, pos, -60, 20, 20,
+                            pinkEnemyBit.getWidth(), pinkEnemyBit.getHeight(), 2, randPos,
                             15*level);
-        }else if(rand == 3){
+        }else if(randType == 3){
             // yellow
             object.add(new Enemy(displayWidth, displayHeight));
             object.get(object.size() - 1)
-                    .objectInit(yellowEnemyBit, displayWidth / 2, -60, 20, 20,
-                            yellowEnemyBit.getWidth(), yellowEnemyBit.getHeight(), 3, 0,
+                    .objectInit(yellowEnemyBit, pos, -60, 20, 20,
+                            yellowEnemyBit.getWidth(), yellowEnemyBit.getHeight(), 3, randPos,
                             25*level);
         }else{
             // default
             object.add(new Enemy(displayWidth, displayHeight));
             object.get(object.size() - 1)
-                    .objectInit(enemyBit, displayWidth / 2, -60, 20, 20,
-                            enemyBit.getWidth(), enemyBit.getHeight(), 0, 0,
+                    .objectInit(enemyBit, pos, -60, 20, 20,
+                            enemyBit.getWidth(), enemyBit.getHeight(), 0, randPos,
                             15*level);
         }
-
         popCount --;
     }
 
-    // ボスのポップ 1600秒くらい
-    public void popBoss(){
+    // ボスの生成 1600秒くらい
+    public void generateBoss(){
         bossMAXHP = 1000 * level;
         isLiveBoss = true;
         object.add(new Boss(displayWidth,displayHeight));
@@ -531,16 +568,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
     // 必殺
     public void fireSpecialBullet(){
         // 普通のとは別に撃つ
-        if(object.get(0).isSpecial){
-            object.add(new PlayerBullet(displayWidth, displayHeight,3.0));
-            object.get(object.size() - 1).objectInit(specialBulletBit, object.get(0).centerX,
-                    object.get(0).centerY - playerBit.getHeight(),
-                    0, 15, specialBulletBit.getWidth(),
-                    specialBulletBit.getHeight(), playerATK * 200);
-            object.get(object.size() - 1).bulletStatus = 4;
-            object.get(0).isSpecial = false;
-        }
+        object.add(new PlayerBullet(displayWidth, displayHeight,3.0));
+        object.get(object.size() - 1).objectInit(specialBulletBit, object.get(0).centerX,
+                object.get(0).centerY - playerBit.getHeight(),
+                0, 15, specialBulletBit.getWidth(),
+                specialBulletBit.getHeight(), playerATK * 200, 4, 0);
         soundPool.play(playerFireSound, 1.0f, 1.0f, 0,0,1);
+    }
+
+    // 斬撃
+    public void fireSlashing(){
+        // 普通のとは別に撃つ
+        object.add(new PlayerBullet(displayWidth, displayHeight,2.0));
+        object.get(object.size() - 1).objectInit(slashingBit, object.get(0).centerX,
+                object.get(0).centerY,
+                0, 10, slashingBit.getWidth(),
+                slashingBit.getHeight(), playerATK * 10, 5, 1);
+        soundPool.play(slashingSound, 1.0f, 1.0f, 0,0,1);
     }
 
     // 敵が弾を撃つ
@@ -678,14 +722,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
     //　被弾の処理
     public void judgeHit(ArrayList<Object> object, int i){
-        //Log.d("judgeHit","executed");
         for(int j = 0; j < object.size() - 1;j++){
+
             // 敵の被弾
             if(i != j && object.get(i).objectType == 1 && object.get(j).objectType == 2){
                 // 被弾したらオブジェクトを削除
                 if(isHitRange(object.get(i).hitRange, object.get(j).hitRange)){
                     // 弾の削除
-                    if(object.get(i).bulletStatus != 4) object.get(i).dead = true;
+                    if(object.get(i).bulletStatus < 4) object.get(i).dead = true;
 
                     // healthが無くなったら撃破
                     if(object.get(j).health < 0) {
@@ -717,7 +761,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                         object.get(j).dead = true;          // 死亡
                         isLiveBoss = false;                 // ボス生存フラグ
                         bossTime = 1600;                    // ボス復活までの時間
-                        ma.hideHealth();                    // ボスのHPバーの削除
                     }else{
                         gameScore += 10;
                         object.get(j).health -= object.get(i).attack;
@@ -751,6 +794,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
                     isGameOver = true;
                 }
             }
+
+            // プレイヤーの斬撃と敵の弾の衝突
+            if(i != j && object.get(i).objectType == 1 && object.get(j).objectType == 5 && object.get(i).bulletStatus == 5){
+                if (isHitRange(object.get(i).hitRange, object.get(j).hitRange)) {
+                    object.get(j).dead = true;              // 弾の削除
+                }
+            }
+
         }
     }
 

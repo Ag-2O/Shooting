@@ -20,9 +20,10 @@ public class Enemy extends Object{
     private int horizontalNum = 0;  // 水平方向の移動のカウント
     private int code = 1;           // 符号反転
     private int flag = 1;
-    private int interval = 20;       // 射撃間隔
+    private int interval = 20;      // 射撃間隔
     private int moveWidth, moveHeight;
-    Random random = new Random();
+    private int popType;            // 湧き場所
+    Random random = new Random();   // 乱数
 
     // コンストラクタ
     public Enemy(){}
@@ -60,15 +61,10 @@ public class Enemy extends Object{
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, float dx, float dy) { }
 
     @Override
-    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, int hp){
-        //image = new BitmapDrawable(resizeImage(bitImage, 2.0));
+    public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int pt, int hp){
         image = new BitmapDrawable(bitImage);
-
         enemyPopCount = 0;
         enemyMoveCount = 0;
-
-        //centerX = utils.setSizeX(displayWidth, x);
-        //centerY = utils.setSizeY(displayHeight, y);
         centerX = x;
         centerY = y;
         speedX = sx;
@@ -80,8 +76,8 @@ public class Enemy extends Object{
         hitRange = new Rect((int) centerX - 60, (int) centerY - 60,
                             (int) centerX + 60, (int) centerY + 60);
         objectType = 2;
-        //Log.d("Enemy objectInit","health: "+health);
         health = hp;
+        popType = pt;
 
         if(random.nextBoolean()) code = -1;
     }
@@ -104,11 +100,40 @@ public class Enemy extends Object{
     // 移動
     @Override
     public void objectMove() {
+        if(popType == 1){
+            straightMove();     // 真下に向かって直進
+        }else if(popType == 2){
+            stopMove();         // 上部で停滞
+        }else{
+            defaultMove();      // 上部で左右に動く
+        }
+
+        fire();                 // 射撃
+
+        hitRange = new Rect((int) centerX - 60, (int) centerY - 60,
+                           (int) centerX + 60, (int) centerY + 60);
+
+        // 範囲外なら死
+        if(isOutDisplayX(- imageWidth / 2)) dead = true;
+        if(isOutDisplayY(- imageHeight / 2)) dead = true;
+
+        interval --;
+    }
+    @Override
+    public void objectMove(int x, int y) {}
+
+    @Override
+    public Rect objectGetTapRect() {
+        return null;
+    }
+
+    // 基本の動き
+    public void defaultMove(){
         // 上からきてレレレ
         if(moveNum < moveHeight) {
             centerY += speedY;
             horizontalNum = 0;
-        }else if(moveNum > 120){
+        }else if(moveNum > 180){
             // 強化
             centerY += speedY;
             interval --;
@@ -120,28 +145,28 @@ public class Enemy extends Object{
             flag = 2;
         }
 
-        // 射撃
+        moveNum++;
+        horizontalNum++;
+    }
+
+    // まっすぐ
+    public void straightMove(){
+        centerY += speedY / 2;
+    }
+
+    // 上部で停滞
+    public void stopMove(){
+        if(moveNum < moveHeight*2) centerY += speedY;   // 停滞
+        if(moveNum > 250) centerX += speedX;            // 一定時間で退場
+        moveNum++;
+    }
+
+    // 射撃
+    public void fire(){
         if(interval < 0){
             isFireBullet = true;
             interval = 30;
         }
-
-        interval --;
-        moveNum++;
-        horizontalNum++;
-
-        hitRange = new Rect((int) centerX - 60, (int) centerY - 60,
-                (int) centerX + 60, (int) centerY + 60);
-
-        // 範囲外なら死
-        if(isOutDisplayX(- imageWidth / 2)) dead = true;
-        if(isOutDisplayY(- imageHeight / 2)) dead = true;
     }
-    @Override
-    public void objectMove(int x, int y) {}
 
-    @Override
-    public Rect objectGetTapRect() {
-        return null;
-    }
 }

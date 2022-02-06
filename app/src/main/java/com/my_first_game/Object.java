@@ -27,7 +27,8 @@ public abstract class Object {
     public int bulletAngle;                     // 弾の画像の角度
     public Rect hitRange;                       // オブジェクトの当たり判定
     public int objectType;                      // オブジェクトの種類
-    public boolean isSpecial = false;           // 必殺状態かどうか
+    public boolean isSpecial = false;           // 必殺を撃つかどうか
+    public boolean isSlashing = false;          // 斬撃を撃つかどうか
 
     // 爆発
     public Drawable[] explosions = new Drawable[4];
@@ -40,11 +41,7 @@ public abstract class Object {
     public boolean isFireBullet = false;        // 弾を撃つかどうか
 
     // 敵の移動
-    public ArrayList<Integer> enemyMoveS = new ArrayList();
-    public ArrayList<Integer> enemyMoveR = new ArrayList();
-    public ArrayList<Integer> enemyMoveC = new ArrayList();
     public int enemyMoveCount;
-    public int moveCount, moveCountX, moveCountY;
 
     // コンストラクタ
     public Object(){}
@@ -87,8 +84,6 @@ public abstract class Object {
     // リサイズ
     public Bitmap resizeImage(Bitmap bitImage, double size){
         double resizeScale = size;
-        //Log.d("resizeImage","width = "+bitImage.getWidth()+", height = "+ bitImage.getHeight()+" .");
-        //Log.d("resizeImage","r_width = "+bitImage.getWidth()*resizeScale+", r_height = "+ bitImage.getHeight()*resizeScale+" .");
 
         return Bitmap.createScaledBitmap(bitImage,
                 (int) (bitImage.getWidth() * resizeScale),
