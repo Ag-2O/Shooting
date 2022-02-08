@@ -306,7 +306,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
 
             // ステップを進める
             ++ gameCount;                               // ゲーム時間を進める
-            level = (gameCount / 400) + 1;              // ゲームのレベルアップ
+            level = (gameCount / 600) + 1;              // ゲームのレベルアップ
         }
 
         // ゲーム終了
@@ -357,7 +357,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback,Runn
         if(isLiveBoss) bossBulletTime --;                           // ボスの攻撃間隔
         if(!isLiveBoss && bossTime == 0) generateBoss();            // 1600カウント毎にボスを湧かせる
         if(!isLiveBoss){
-            if(gameCount % popTime == 0) popCount = 5 + level / 2;  // popTime毎に湧き数をリセット
+            if(gameCount % popTime == 0) popCount = 5 + level / 3;  // popTime毎に湧き数をリセット
             if(popCount > 0 && gameCount % 5 == 0 && gameCount != 0) generateEnemies();  // 5step毎敵を湧かせる
             bossTime --;
         }

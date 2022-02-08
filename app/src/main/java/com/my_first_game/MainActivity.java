@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.media.AudioAttributes;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.graphics.PixelFormat;
@@ -34,7 +35,6 @@ import java.lang.reflect.Method;
 public class MainActivity extends AppCompatActivity {
     public int gvWidth, gvHeight;       // 画面幅と高さ
     public int fireMode = 0;            // 射撃モード(0-3)
-    public GameView gv;                 // surfaces
 
     public boolean isSetting = false;           // 設定画面
     public boolean isSpecialAvailable = false;  // 必殺が撃てるかどうか
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean isSlashingAvailable = false; // 斬撃が撃てるかどうか
     public boolean isSlashing = false;          // 斬撃ボタンを押したかどうか
 
-
+    private MediaPlayer mediaPlayer;    // BGM再生設定
     private SoundPool soundPool;        // 音声設定
     private int enterSound;             // 決定ボタン/メニューボタンの効果音
     private int modeChangeSound;        // モード変更ボタンの効果音
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setSounds(){
-        // 音声設定
+        // 効果音設定
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
@@ -87,6 +87,12 @@ public class MainActivity extends AppCompatActivity {
         soundPool = new SoundPool.Builder()
                 .setAudioAttributes(audioAttributes)
                 .build();
+
+        // BGM設定
+        mediaPlayer = MediaPlayer.create(this, R.raw.bgm);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.setVolume((float)1.0,(float)1.0);
+        mediaPlayer.start();
 
         // 音声読み込み
         enterSound = soundPool.load(this, R.raw.enter, 1);
@@ -272,6 +278,10 @@ public class MainActivity extends AppCompatActivity {
 
     // プレイヤーが被弾したらリザルトへ
     public void toResult(int score, int clearType){
+        // bgmの停止
+        mediaPlayer.stop();
+        mediaPlayer.release();
+
         Intent intent = new Intent(getApplicationContext(),ResultActivity.class);
         intent.putExtra("SCORE",score);
         intent.putExtra("CLEAR_TYPE",clearType);
