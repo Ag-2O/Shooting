@@ -5,7 +5,6 @@ package com.my_first_game;
  */
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -54,4 +53,8 @@ public class ResultActivity extends AppCompatActivity {
     public void tryAgain(View view){
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
+
+    // 戻るボタンの無効化
+    @Override
+    public void onBackPressed() { }
 }

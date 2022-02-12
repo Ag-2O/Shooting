@@ -4,14 +4,10 @@ package com.my_first_game;
     敵オブジェクト
  */
 
-import java.util.ArrayList;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
 
 public class Boss extends Object{
     private int moveNum = 0;        // 行動制御する変数
@@ -58,13 +54,8 @@ public class Boss extends Object{
     @Override
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs, int epc, int hp){
         image = new BitmapDrawable(resizeImage(bitImage, 2.0));
-        //image = new BitmapDrawable(bitImage);
-
         enemyPopCount = 0;
         enemyMoveCount = 0;
-
-        //centerX = utils.setSizeX(displayWidth, x);
-        //centerY = utils.setSizeY(displayHeight, y);
         centerX = x;
         centerY = y;
         speedX = sx;
@@ -76,7 +67,6 @@ public class Boss extends Object{
         hitRange = new Rect((int) centerX - 130, (int) centerY - 130,
                 (int) centerX + 130, (int) centerY + 130);
         objectType = 6;
-        //Log.d("Enemy objectInit","health: "+health);
         health = hp;
     }
 

@@ -8,9 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
-
-import java.util.ArrayList;
 
 public class EnemyBullet extends Object{
     public boolean isTrack = false;             // 追尾弾を撃つかどうか
@@ -58,7 +55,6 @@ public class EnemyBullet extends Object{
         objectType = 5;
         isTrack = true;
         bulletAngle = (int) utils.getAngle(centerX, centerY, destinationX, destinationY) + 90;
-        //Log.d("enemyBullet","bulletAngle: "+bulletAngle);
     }
 
     @Override

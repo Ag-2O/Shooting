@@ -126,6 +126,19 @@
         android:textColor="@color/white"
         android:textSize="10pt" />
 
+    <!-- チュートリアル表示 -->
+    <TextView
+        android:id="@+id/tutorialtext"
+        android:text=" 自機をスワイプ!"
+        android:layout_width="85pt"
+        android:layout_height="14pt"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:textColor="@color/white"
+        android:background="@drawable/black"
+        android:textSize="10pt" />
+
+
     <!-- POSE -->
     <TextView
         android:id="@+id/pose"
@@ -149,6 +162,31 @@
         android:background="@color/black">
 
         <TableRow
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"/>
+
+        <ImageView
+            android:layout_width="8pt"
+            android:layout_height="8pt"
+            android:src="@drawable/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="     オブジェクト "
+            android:textColor="@color/white"
+            android:textSize="16pt" />
+
+        <ImageView
+            android:layout_width="8pt"
+            android:layout_height="8pt"
+            android:src="@drawable/black" />
+
+
+
+        <TableRow
             android:layout_marginTop="2pt"
             android:gravity="center_vertical">
 
@@ -161,9 +199,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
-                android:text="Enemy"
+                android:text="敵、弾を当てて倒そう"
                 android:textColor="@color/white"
-                android:textSize="16pt" />
+                android:textSize="10pt" />
         </TableRow>
 
         <TableRow
@@ -179,9 +217,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
-                android:text="Mode Change"
+                android:text="弾の属性の変更"
                 android:textColor="@color/white"
-                android:textSize="16pt" />
+                android:textSize="10pt" />
         </TableRow>
 
         <TableRow
@@ -190,18 +228,57 @@
             android:gravity="center_vertical">
 
             <ImageView
-                android:layout_width="22pt"
-                android:layout_height="22pt"
+                android:layout_width="16pt"
+                android:layout_height="16pt"
+                android:src="@drawable/buttons_special" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="必殺技、大ダメージ"
+                android:textColor="@color/white"
+                android:textSize="10pt" />
+        </TableRow>
+
+        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16pt"
+                android:layout_height="16pt"
+                android:src="@drawable/buttons_slashing" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="斬撃、相手の弾を消す"
+                android:textColor="@color/white"
+                android:textSize="10pt" />
+        </TableRow>
+
+        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16pt"
+                android:layout_height="16pt"
                 android:src="@drawable/items_energy" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
-                android:text="ATK UP"
+                android:text="アイテム、攻撃力が上昇"
                 android:textColor="@color/white"
-                android:textSize="16pt" />
+                android:textSize="10pt" />
         </TableRow>
+
 
         <TableRow
             android:layout_height="wrap_content"
@@ -217,7 +294,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
-                android:text="-Weaknesses-"
+                android:text=" 属性の弱点関係 "
                 android:textColor="@color/white"
                 android:textSize="16pt" />
 
@@ -242,7 +319,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
-                android:text="     →"
+                android:text="  →　2倍　→"
                 android:textColor="@color/white"
                 android:textSize="16pt" />
 
@@ -266,7 +343,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
-                android:text="     →"
+                android:text="  →　2倍　→"
                 android:textColor="@color/white"
                 android:textSize="16pt" />
 
@@ -290,7 +367,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
-                android:text="     →"
+                android:text="  →　2倍　→"
                 android:textColor="@color/white"
                 android:textSize="16pt" />
 

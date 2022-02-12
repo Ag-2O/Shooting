@@ -9,8 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 
-import java.util.ArrayList;
-
 public class Player extends Object{
     // コンストラクタ
     public Player(){}
@@ -24,8 +22,6 @@ public class Player extends Object{
     @Override
     public void objectInit(Bitmap bitImage, float x, float y, float sx, float sy, int imgw, int imgh, int bs){
         image = new BitmapDrawable(bitImage);
-        //centerX = utils.setSizeX(displayWidth,x);
-        //centerY = utils.setSizeY(displayHeight,y);
         centerX = x;
         centerY = y;
         speedX = sx;

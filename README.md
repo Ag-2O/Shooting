@@ -11,15 +11,10 @@
 この属性にあった弾で攻撃することで効率良く倒すことができます。  
 <img src = "https://user-images.githubusercontent.com/80666305/151593160-6d6b89cc-9c9d-44fe-a096-7a0938cc37b3.png" width="150">
 
-
 # Google Store URL
 TBD  
 
 # TODO
-・カクつき(おま環)  
-・オリジナリティの追加  
-・爆発のアニメーションの追加  
-・弾の移動処理のNullPointerException  
 ・デバッグ
 
 # 開発環境

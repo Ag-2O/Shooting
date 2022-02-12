@@ -4,16 +4,11 @@ package com.my_first_game;
     敵オブジェクト
  */
 
-import java.util.ArrayList;
 import java.util.Random;
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
 
 public class Enemy extends Object{
     private int moveNum = 0;        // 行動制御する変数

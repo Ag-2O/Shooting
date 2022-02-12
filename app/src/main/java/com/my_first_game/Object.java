@@ -8,11 +8,7 @@ package com.my_first_game;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
-
-import java.util.ArrayList;
 
 public abstract class Object {
     public Utils utils = new Utils();
@@ -27,8 +23,6 @@ public abstract class Object {
     public int bulletAngle;                     // 弾の画像の角度
     public Rect hitRange;                       // オブジェクトの当たり判定
     public int objectType;                      // オブジェクトの種類
-    public boolean isSpecial = false;           // 必殺を撃つかどうか
-    public boolean isSlashing = false;          // 斬撃を撃つかどうか
 
     // 爆発
     public Drawable[] explosions = new Drawable[4];

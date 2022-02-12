@@ -4,14 +4,10 @@ package com.my_first_game;
     自分が発射した弾オブジェクト
  */
 
-
 import android.graphics.Rect;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
-
-import java.util.ArrayList;
 
 public class PlayerBullet extends Object {
     public double size = 0.5;       // 弾の倍率

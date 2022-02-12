@@ -9,8 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 
-import java.util.ArrayList;
-
 public class Explosion extends Object{
     // コンストラクタ
     public Explosion(){}

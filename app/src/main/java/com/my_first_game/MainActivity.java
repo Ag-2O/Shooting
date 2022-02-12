@@ -1,36 +1,24 @@
 package com.my_first_game;
 
-import androidx.appcompat.app.AppCompatActivity;
+/*
+    メイン画面
+ */
 
+import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.graphics.PixelFormat;
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.Display;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
-
-import java.lang.reflect.Method;
-
-/*
-    メイン画面
- */
 
 public class MainActivity extends AppCompatActivity {
     public int gvWidth, gvHeight;       // 画面幅と高さ
@@ -230,13 +218,14 @@ public class MainActivity extends AppCompatActivity {
 
     // ゲームレベルの表示
     public void updateLevel(int level){
-        TextView attackText = (TextView) findViewById(R.id.leveltext);
-        attackText.setText(" Level: "+level);
+        TextView levelText = (TextView) findViewById(R.id.leveltext);
+        levelText.setText(" Level: "+level);
     }
 
-    //TODO: チュートリアル表示
-    public void displayTutorial(){
-
+    // チュートリアル表示
+    public void closedTutorial(){
+        TextView tutorialText = (TextView) findViewById(R.id.tutorialtext);
+        tutorialText.setVisibility(View.GONE);
     }
 
     /*
@@ -279,12 +268,21 @@ public class MainActivity extends AppCompatActivity {
     // プレイヤーが被弾したらリザルトへ
     public void toResult(int score, int clearType){
         // bgmの停止
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        stopBGM();
 
         Intent intent = new Intent(getApplicationContext(),ResultActivity.class);
         intent.putExtra("SCORE",score);
         intent.putExtra("CLEAR_TYPE",clearType);
         startActivity(intent);
     }
+
+    // bgmの停止
+    public void stopBGM(){
+        mediaPlayer.stop();
+        mediaPlayer.release();
+    }
+
+    // 戻るボタンの無効化
+    @Override
+    public void onBackPressed() {}
 }
